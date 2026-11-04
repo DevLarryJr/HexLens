@@ -1,0 +1,50 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:proyecto_movil/screens/liquidacion_comisiones_screen.dart';
+import 'package:proyecto_movil/theme/app_theme.dart';
+import 'package:proyecto_movil/widgets/cierres/liquidacion_widgets.dart';
+
+void main() {
+  setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
+
+  Future<void> abrir(WidgetTester t) async {
+    t.view.physicalSize = const Size(1600, 12000);
+    t.view.devicePixelRatio = 1;
+    addTearDown(t.view.reset);
+    // La fuente de pruebas (Ahem) es más ancha que Noto Sans; este test solo mira lógica.
+    await t.pumpWidget(MaterialApp(
+      theme: buildAppTheme(),
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(0.6)),
+        child: child!,
+      ),
+      home: const LiquidacionComisionesScreen(),
+    ));
+    await t.pumpAndSettle(); // las comisiones se cargan al abrir
+  }
+
+  String formula(WidgetTester t) => t
+      .widgetList<RichText>(find.byType(RichText))
+      .map((r) => r.text.toPlainText())
+      .firstWhere((s) => s.startsWith('Comisión: '));
+
+  testWidgets('Liquidación: datos del cierre 10A y fórmula con la tasa elegida', (t) async {
+    await abrir(t);
+    expect(find.text('Período: 01 Oct 2026 – 15 Oct 2026'), findsOneWidget);
+    expect(find.text('Todos (3)'), findsOneWidget);
+    expect(find.byType(SesionLiquidadaCard), findsNWidgets(4));
+    expect(formula(t), contains('(30%)'));
+
+    await t.tap(find.text('Mateo Ríos'));
+    await t.pump();
+    expect(formula(t), contains('(35%)'));
+    expect(find.text('C.C. 80.124.567 • Especialidad Familiar'), findsOneWidget);
+
+    await t.tap(find.text('Todos (3)'));
+    await t.pump();
+    expect(find.byType(LiquidacionResumenCard), findsNWidgets(3));
+    expect(formula(t), contains('(según cada contrato)'));
+    expect(find.textContaining('\$96.000', findRichText: true), findsOneWidget); // Sara
+  });
+}
