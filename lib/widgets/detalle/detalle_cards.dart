@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Código de la reserva ("# RSV-2026-009"). Volver queda solo en la flecha del header, que dice a dónde regresa.
 class DetalleCodigo extends StatelessWidget {
   const DetalleCodigo({super.key, required this.codigo});
 
@@ -26,7 +25,6 @@ class DetalleCodigo extends StatelessWidget {
   }
 }
 
-/// Cliente, estado y set de la sesión.
 class DetalleHeroCard extends StatelessWidget {
   const DetalleHeroCard({
     super.key,
@@ -36,15 +34,12 @@ class DetalleHeroCard extends StatelessWidget {
     this.estado = 'Programada',
   });
 
-  /// "Programada", "En curso", "Realizada" o "Cancelada".
   final String estado;
 
   final String cliente;
 
-  /// Documento y ciudad: "C.C. 1.025.340.890 •\nBogotá D.C.".
   final String documento;
 
-  /// Ej.: "Estudio A • 85mm f/1.4".
   final String set;
 
   @override
@@ -64,7 +59,6 @@ class DetalleHeroCard extends StatelessWidget {
                     Text('SESIÓN INDIVIDUAL',
                         style: AppText.sans(14, color: AppColors.onSurfaceVariant, lineHeight: 18, letterSpacing: 0.7)),
                     const SizedBox(height: 4),
-                    // Hasta 2 líneas: a 28 px los nombres largos se cortaban ("Valentina …").
                     Text(cliente,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -99,7 +93,6 @@ class DetalleHeroCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Flexible: con locaciones de nombre largo el set baja a dos líneas.
                 Flexible(
                   child: IconoTexto(const SvgIcon('detalle/aperture.svg', width: 15), set,
                       estilo: AppText.sans(14, lineHeight: 18), separacion: 8, ajuste: FlexFit.loose),
@@ -115,7 +108,6 @@ class DetalleHeroCard extends StatelessWidget {
   }
 }
 
-/// Imágenes de referencia de la sesión (moodboard y esquema de luces).
 class MoodboardRow extends StatelessWidget {
   const MoodboardRow({super.key});
 
@@ -174,7 +166,6 @@ class _MoodTile extends StatelessWidget {
   }
 }
 
-/// Fecha, bloque horario y canales de contacto de la sesión.
 class AgendaDetalleCard extends StatelessWidget {
   const AgendaDetalleCard({
     super.key,
@@ -187,17 +178,13 @@ class AgendaDetalleCard extends StatelessWidget {
     required this.email,
   });
 
-  /// Ej.: "Creada 10 Oct\n2026".
   final String creada;
 
-  /// Ej.: "Jueves, 15 Oct".
   final String fecha;
   final int anio;
 
-  /// Ej.: "10:00 - 10:45 AM".
   final String horario;
 
-  /// Ej.: "45 minutos".
   final String duracion;
   final String telefono;
   final String email;
@@ -326,7 +313,6 @@ class _ContactRow extends StatelessWidget {
   }
 }
 
-/// Servicio, tarifa, fotógrafo asignado con su comisión y medio de pago.
 class ServicioLiquidacionCard extends StatelessWidget {
   const ServicioLiquidacionCard({
     super.key,
@@ -345,13 +331,11 @@ class ServicioLiquidacionCard extends StatelessWidget {
   final String servicio;
   final String descripcion;
 
-  /// Formateada, sin moneda: "$120.000".
   final String tarifa;
   final String fotografoIniciales;
   final String fotografo;
   final int comisionPct;
 
-  /// Formateada, con moneda: "$36.000 COP".
   final String liquidacion;
   final String pago;
 

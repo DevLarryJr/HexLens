@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Tarjeta de un día en el selector de fecha de la reserva.
 class DiaCard extends StatelessWidget {
   const DiaCard({
     super.key,
@@ -17,17 +16,14 @@ class DiaCard extends StatelessWidget {
     this.onTap,
   });
 
-  /// Ej.: "JUE".
   final String abrev;
   final int numero;
 
-  /// Ej.: "4 Libres", "Pasado", "Alta Demanda".
   final String estado;
   final bool selected;
   final bool pasado;
   final bool altaDemanda;
 
-  /// Muestra la cinta roja "HOY".
   final bool hoy;
   final VoidCallback? onTap;
 

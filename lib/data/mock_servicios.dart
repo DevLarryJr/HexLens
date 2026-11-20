@@ -1,12 +1,12 @@
 import 'package:flutter/foundation.dart';
 
-import '../api/api.dart';
-import '../api/servicios_api.dart';
 import '../models/especialidad.dart';
 import '../models/servicio.dart';
+import '../models/servicio/servicio_request.dart';
+import '../services/local/sesion_actual.dart';
+import '../services/remote/servicios_api.dart';
 import 'mock_especialidades.dart';
 
-/// Servicios de ejemplo (sin sesión en la API): una sola tarifa por servicio en toda la app.
 const _ejemplo = [
   Servicio(
     codigo: '#SRV-001',
@@ -95,45 +95,36 @@ const _ejemplo = [
   ),
 ];
 
-/// Servicios del estudio: los de la API si hay sesión, si no los de ejemplo.
 final List<Servicio> serviciosEstudio = [..._ejemplo];
 
-/// Cambia cada vez que se crea, edita o elimina un servicio.
 final revisionServicios = ValueNotifier(0);
 
-/// Servicio de ejemplo por código. Lanza si no existe (los códigos de abajo son fijos).
 Servicio _deEjemplo(String codigo) => _ejemplo.firstWhere((s) => s.codigo == codigo);
 
-/// Servicio por defecto de las pantallas de la reserva cuando no hay ninguno elegido.
 final servicioEjemplo = _deEjemplo('#SRV-001');
 
-/// Servicios del catálogo administrativo: todos los de la API, o 6 de ejemplo (Figma "Catálogo de Servicios").
-List<Servicio> get serviciosCatalogo => Api.conectada
+List<Servicio> get serviciosCatalogo => SesionActual.conectada
     ? serviciosEstudio
     : [for (final c in ['#SRV-001', '#SRV-002', '#SRV-003', '#SRV-004', '#SRV-005', '#SRV-006']) _deEjemplo(c)];
 
-/// Servicios que se ofrecen en el paso 2 de "Nueva reserva": todos los de la API, o 6 de ejemplo.
-List<Servicio> get serviciosReserva => Api.conectada
+List<Servicio> get serviciosReserva => SesionActual.conectada
     ? serviciosEstudio
     : [for (final c in ['#SRV-001', '#SRV-002', '#SRV-007', '#SRV-008', '#SRV-009', '#SRV-010']) _deEjemplo(c)];
 
-/// Servicios de una especialidad (por su id de la API o, en los de ejemplo, por su nombre).
 List<Servicio> serviciosDe(Especialidad e) => [
       for (final s in serviciosEstudio)
         if (e.id != null ? s.especialidadId == e.id : s.categoria == e.nombre) s,
     ];
 
-/// Con sesión en la API, reemplaza la lista por la de `GET /api/servicios`. Lanza [ApiError] si falla.
 Future<void> sincronizarServicios() async {
-  if (!Api.conectada) return;
-  final deLaApi = await obtenerServiciosApi();
+  if (!SesionActual.conectada) return;
+  final deLaApi = await ServiciosApi().listar(nombreEspecialidad: nombreEspecialidad);
   serviciosEstudio
     ..clear()
-    ..addAll([for (final s in deLaApi) servicioDesdeApi(s, nombreEspecialidad: nombreEspecialidad)]);
+    ..addAll(deLaApi);
   revisionServicios.value++;
 }
 
-/// Crea un servicio (en la API si hay sesión) y lo agrega a la lista.
 Future<Servicio> crearServicio({
   required String nombre,
   required int precio,
@@ -142,15 +133,15 @@ Future<Servicio> crearServicio({
   required Especialidad especialidad,
 }) async {
   final Servicio nuevo;
-  if (Api.conectada) {
-    final json = await crearServicioApi(servicioParaApi(
+  if (SesionActual.conectada) {
+    final request = ServicioRequest(
       nombre: nombre,
       precio: precio,
       descripcion: descripcion,
       duracionMin: duracionMin,
       especialidadId: especialidad.id ?? 0,
-    ));
-    nuevo = servicioDesdeApi(json, nombreEspecialidad: nombreEspecialidad);
+    );
+    nuevo = await ServiciosApi().crear(request, nombreEspecialidad: nombreEspecialidad);
   } else {
     nuevo = Servicio(
       codigo: '#SRV-${(serviciosEstudio.length + 1).toString().padLeft(3, '0')}',
@@ -166,13 +157,11 @@ Future<Servicio> crearServicio({
   return nuevo;
 }
 
-/// Cambia precio, duración y descripción de [s] (en la API si hay sesión). El nombre y la especialidad no
-/// se cambian, para no alterar el histórico de sesiones y comisiones.
 Future<Servicio> actualizarServicio(Servicio s, {required int precio, required int duracionMin, required String descripcion}) async {
-  if (Api.conectada && s.id != null) {
-    await actualizarServicioApi(
+  if (SesionActual.conectada && s.id != null) {
+    await ServiciosApi().actualizar(
       s.id!,
-      servicioParaApi(
+      ServicioRequest(
         nombre: s.nombre,
         precio: precio,
         descripcion: descripcion,
@@ -199,9 +188,8 @@ Future<Servicio> actualizarServicio(Servicio s, {required int precio, required i
   return editado;
 }
 
-/// Elimina el servicio (en la API si hay sesión). Si la API lo rechaza, lanza [ApiError] y no se quita.
 Future<void> eliminarServicio(Servicio s) async {
-  if (Api.conectada && s.id != null) await eliminarServicioApi(s.id!);
+  if (SesionActual.conectada && s.id != null) await ServiciosApi().eliminar(s.id!);
   serviciosEstudio.remove(s);
   revisionServicios.value++;
 }

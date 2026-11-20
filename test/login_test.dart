@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:proyecto_movil/api/api.dart';
 import 'package:proyecto_movil/screens/login_screen.dart';
 import 'package:proyecto_movil/theme/app_theme.dart';
 
@@ -15,7 +14,6 @@ void main() {
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
     final logins = <bool>[];
-    // La fuente de pruebas (Ahem) es más ancha que Noto Sans; este test solo mira lógica.
     await t.pumpWidget(MaterialApp(
       theme: buildAppTheme(),
       builder: (context, child) => MediaQuery(
@@ -36,7 +34,6 @@ void main() {
     expect(logins, isEmpty);
     expect(find.text('Ingresa tu usuario y contraseña'), findsOneWidget);
 
-    // Clave equivocada: la API responde 401 y no entra.
     usarApiFalsa();
     await t.enterText(find.byType(TextField).first, usuarioPrueba);
     await t.enterText(find.byType(TextField).last, 'otra-clave');
@@ -45,13 +42,11 @@ void main() {
     expect(logins, isEmpty);
     expect(find.text('Usuario o clave incorrectos.'), findsOneWidget);
 
-    // Clave correcta: entra con el rol que dice la API (Gestor → panel administrativo), aunque el
-    // selector diga Fotógrafo.
     await t.enterText(find.byType(TextField).last, clavePrueba);
     await t.tap(find.text('Fotógrafo'));
     await t.tap(find.text('Iniciar sesión'));
     await t.pumpAndSettle();
     expect(logins, [true]);
-    expect(Api.sesion?.empresa, 'Hex Lens');
+    expect(SesionActual.usuario?.empresa, 'Hex Lens');
   });
 }

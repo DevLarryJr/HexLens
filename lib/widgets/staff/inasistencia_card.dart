@@ -6,8 +6,6 @@ import '../../utils/formato.dart';
 import '../hex_form.dart';
 import '../hex_widgets.dart';
 
-/// Tarjeta de una inasistencia. Según el tipo: capacitación (bloqueo activo,
-/// con acciones), cita médica (cumplida) o licencia de otro fotógrafo (en pausa).
 class InasistenciaCard extends StatelessWidget {
   const InasistenciaCard({
     super.key,
@@ -20,10 +18,8 @@ class InasistenciaCard extends StatelessWidget {
 
   final Inasistencia inasistencia;
 
-  /// Reservas que caen dentro del bloqueo.
   final int citasAfectadas;
 
-  /// Especialidad cuya agenda queda inhabilitada.
   final String especialidad;
   final VoidCallback? onEditar;
   final VoidCallback? onLiberar;

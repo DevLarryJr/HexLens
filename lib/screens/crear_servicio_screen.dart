@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../api/api.dart';
 import '../data/mock_especialidades.dart';
 import '../data/mock_fotografos.dart';
 import '../data/mock_servicios.dart';
 import '../models/servicio.dart';
+import '../services/remote/api_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/formateadores.dart';
 import '../utils/formato.dart';
@@ -12,9 +12,6 @@ import '../widgets/hex_form.dart';
 import '../widgets/hex_widgets.dart';
 import '../widgets/servicios/crear_servicio_widgets.dart';
 
-/// Figma: "HexLens - Crear Servicio y Tarifa" (41:1596).
-/// Sin [servicio] crea uno nuevo; con él lo edita (precio, duración y descripción: el nombre y la especialidad
-/// quedan bloqueados para no alterar el histórico).
 class CrearServicioScreen extends StatefulWidget {
   const CrearServicioScreen({super.key, this.servicio});
 
@@ -34,7 +31,6 @@ class _CrearServicioScreenState extends State<CrearServicioScreen> with ProtegeC
   late final _precio = TextEditingController(text: _editando == null ? '' : milesConPunto('${_editando!.precio}'));
   late final _descripcion = TextEditingController(text: _editando?.descripcion ?? '');
 
-  /// Duraciones que se ofrecen; si el servicio editado dura otra cosa, se agrega la suya.
   late final List<(int, String)> _duraciones = [
     (30, 'Compacto'),
     (45, 'Estándar'),
@@ -46,17 +42,13 @@ class _CrearServicioScreenState extends State<CrearServicioScreen> with ProtegeC
   late String _especialidad = _editando?.categoria ?? _especialidades.firstOrNull ?? '';
   bool _intentado = false;
 
-  /// Enviando a la API.
   bool _guardando = false;
 
-  /// Nombres de las especialidades (de la API si hay sesión).
   static List<String> get _especialidades => [for (final e in especialidades) e.nombre];
 
-  /// "Laura M." — fotógrafos con esa especialidad.
   String get _habilitados =>
       fotografos.where((f) => f.especialidad == _especialidad).map((f) => nombreCorto(f.nombre)).join(', ');
 
-  /// Comisión del titular de la especialidad (30 % si no tiene).
   int get _comisionPct => titularDe(_especialidad)?.comisionPct ?? 30;
 
   @override
@@ -98,8 +90,8 @@ class _CrearServicioScreenState extends State<CrearServicioScreen> with ProtegeC
         if (mounted) showHexToast(context, 'Servicio "${editando.nombre}" actualizado');
       }
       if (mounted) salirSinPreguntar();
-    } on ApiError catch (e) {
-      if (mounted) showHexToast(context, e.mensaje);
+    } on ApiException catch (e) {
+      if (mounted) showHexToast(context, e.message);
     } finally {
       if (mounted) setState(() => _guardando = false);
     }
@@ -127,12 +119,11 @@ class _CrearServicioScreenState extends State<CrearServicioScreen> with ProtegeC
       if (!mounted) return;
       showHexToast(context, 'Servicio "${s.nombre}" eliminado');
       salirSinPreguntar();
-    } on ApiError catch (e) {
-      if (mounted) showHexToast(context, e.mensaje);
+    } on ApiException catch (e) {
+      if (mounted) showHexToast(context, e.message);
     }
   }
 
-  /// Valor que no se puede cambiar al editar (nombre, especialidad).
   Widget _bloqueado(String valor) => InfoBox(
         icon: Icons.lock_outline,
         child: Text(valor, style: AppText.sans(16, weight: FontWeight.w600, lineHeight: 22)),

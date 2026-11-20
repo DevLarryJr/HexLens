@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Aviso con los parámetros de la jornada del fotógrafo.
 class JornadaInfoCard extends StatelessWidget {
   const JornadaInfoCard({super.key, required this.texto});
 
@@ -42,11 +41,9 @@ class JornadaInfoCard extends StatelessWidget {
   }
 }
 
-/// Set y equipo asignados automáticamente a la sesión.
 class SetAsignadoCard extends StatelessWidget {
   const SetAsignadoCard({super.key, required this.set, required this.equipo});
 
-  /// Ej.: "Set Estudio A • Ciclorama Blanco".
   final String set;
   final String equipo;
 

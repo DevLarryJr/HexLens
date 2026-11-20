@@ -12,7 +12,6 @@ void main() {
     t.view.physicalSize = const Size(1600, 8000);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
-    // La fuente de pruebas (Ahem) es más ancha que Noto Sans; este test solo mira lógica.
     await t.pumpWidget(MaterialApp(
       theme: buildAppTheme(),
       builder: (context, child) => MediaQuery(
@@ -29,7 +28,7 @@ void main() {
     expect(find.textContaining('\$3.050.000', findRichText: true), findsOneWidget);
     expect(find.text('\$988.000'), findsOneWidget);
     expect(find.text('\$2.062.000'), findsOneWidget);
-    expect(find.text('\$822.000'), findsOneWidget); // Estudio = Total − Staff de octubre
+    expect(find.text('\$822.000'), findsOneWidget);
     expect(find.text('Quincena 1 • 01 Oct 2026 - 15 Oct 2026'), findsOneWidget);
     expect(find.text('Laura M., Mateo R., Sara T.'), findsOneWidget);
   });
@@ -40,9 +39,8 @@ void main() {
     await t.pump();
     expect(find.byType(CierreCard), findsOneWidget);
     expect(find.text('1 registro'), findsOneWidget);
-    expect(find.textContaining('\$1.200.000', findRichText: true), findsNWidgets(2)); // resumen y tarjeta
+    expect(find.textContaining('\$1.200.000', findRichText: true), findsNWidgets(2));
 
-    // Los meses del filtro salen de los cierres que existen (sin meses vacíos fijos).
     expect(find.text('Agosto'), findsNothing);
     await t.tap(find.text('Septiembre'));
     await t.pump();

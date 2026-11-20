@@ -5,7 +5,6 @@ import '../../theme/app_theme.dart';
 import '../../utils/formato.dart';
 import '../hex_widgets.dart';
 
-/// Etiqueta negra de módulo financiero "✦ HEX-FINANCE // ...".
 class FinanceTag extends StatelessWidget {
   const FinanceTag(this.text, {super.key});
 
@@ -23,7 +22,6 @@ class FinanceTag extends StatelessWidget {
   }
 }
 
-/// Botón negro "+ Nuevo Cierre Contable" con atajo F10.
 class NuevoCierreBoton extends StatelessWidget {
   const NuevoCierreBoton({super.key, this.onTap});
 
@@ -57,7 +55,6 @@ class NuevoCierreBoton extends StatelessWidget {
   }
 }
 
-/// Año fijo en negro seguido de los filtros de mes.
 class PeriodoFiltros extends StatelessWidget {
   const PeriodoFiltros({
     super.key,
@@ -107,11 +104,9 @@ class PeriodoFiltros extends StatelessWidget {
   }
 }
 
-/// "RESUMEN CONSOLIDADO ACTIVO": facturado, comisiones y parte del estudio.
 class ResumenConsolidadoCard extends StatelessWidget {
   const ResumenConsolidadoCard({super.key, required this.total, required this.staff, required this.estudio});
 
-  /// Importes ya formateados ("$1.840.000").
   final String total;
   final String staff;
   final String estudio;
@@ -209,7 +204,6 @@ class ResumenConsolidadoCard extends StatelessWidget {
   }
 }
 
-/// Tarjeta de un cierre: auditado (con fotógrafos y detalle) o ya liquidado (archivado).
 class CierreCard extends StatelessWidget {
   const CierreCard({super.key, required this.cierre, this.onVerDetalle});
 
@@ -426,7 +420,6 @@ class _Montos extends StatelessWidget {
     return Row(
       children: [
         for (final (i, (label, value, color)) in items.indexed) ...[
-          // Separación entre columnas: sin ella las cifras quedaban pegadas ("$1.200.000$378.000").
           if (i > 0) const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -448,7 +441,6 @@ class _Montos extends StatelessWidget {
   }
 }
 
-/// "Regla de Consolidación": solo cuentan los servicios realizados.
 class ReglaConsolidacion extends StatelessWidget {
   const ReglaConsolidacion({super.key});
 

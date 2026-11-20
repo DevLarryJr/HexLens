@@ -12,7 +12,6 @@ import '../widgets/hex_widgets.dart';
 
 enum _Tipo { cliente, servicio, fotografo }
 
-/// Índice de búsqueda: (tipo, título, detalle), armado desde los modelos (incluye los clientes recién registrados).
 List<(_Tipo, String, String)> get _indice => [
   for (final c in clientes) (_Tipo.cliente, c.nombre, c.documento),
   for (final s in serviciosEstudio.where((s) => s.activo))
@@ -20,11 +19,9 @@ List<(_Tipo, String, String)> get _indice => [
   for (final f in fotografos) (_Tipo.fotografo, f.nombre, '${f.especialidad} • ${f.documento}'),
 ];
 
-/// La consulta es solo un número (con o sin "C.C.", "NIT", puntos o espacios).
 bool _esNumero(String q) =>
     soloDigitos(q).isNotEmpty && q.replaceAll(RegExp(r'c\.?c\.?|nit|[\d\s.\-]'), '').isEmpty;
 
-/// Figma: "HexLens - Búsqueda: Sin Resultados" (41:1818). Búsqueda global con estado vacío.
 class BusquedaGlobalScreen extends StatefulWidget {
   const BusquedaGlobalScreen({super.key, this.inicial = 'Carlos Pérez', this.onRegistrar});
 

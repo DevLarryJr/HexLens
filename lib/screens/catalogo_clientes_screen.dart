@@ -11,7 +11,6 @@ import '../widgets/hex_chips.dart';
 import '../widgets/hex_search_field.dart';
 import '../widgets/hex_widgets.dart';
 
-/// Figma: "HexLens - Catálogo de Clientes" (19:2020)
 class CatalogoClientesScreen extends StatefulWidget {
   const CatalogoClientesScreen({
     super.key,
@@ -27,7 +26,6 @@ class CatalogoClientesScreen extends StatefulWidget {
   final VoidCallback? onAgendar;
   final VoidCallback? onVerFicha;
 
-  /// Se invoca al buscar un término sin coincidencias.
   final ValueChanged<String>? onSinResultados;
 
   @override
@@ -51,8 +49,6 @@ class _CatalogoClientesScreenState extends State<CatalogoClientesScreen> with Co
     }).toList();
   }
 
-  /// Para clientes con sesión programada, el detalle sale de su próxima sesión
-  /// en la agenda; si no hay ninguna, se usa el detalle guardado.
   static String _detalle(Cliente c) {
     if (c.estado != EstadoCliente.programada) return c.detalle;
     final proximas = sesionesAgenda

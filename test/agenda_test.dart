@@ -11,7 +11,6 @@ void main() {
     t.view.physicalSize = const Size(1600, 8000);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
-    // La fuente de pruebas (Ahem) es más ancha que Noto Sans; este test solo mira lógica.
     await t.pumpWidget(MaterialApp(
       theme: buildAppTheme(),
       builder: (context, child) => MediaQuery(
@@ -38,7 +37,7 @@ void main() {
 
     await t.tap(find.text('Programadas (3)'));
     await t.pump();
-    expect(find.text('Daniel Castro'), findsNothing); // realizada
+    expect(find.text('Daniel Castro'), findsNothing);
     expect(find.text('Andrés Molina'), findsOneWidget);
 
     await t.tap(find.text('Mateo R.'));
@@ -46,7 +45,6 @@ void main() {
     expect(find.text('Andrés Molina'), findsOneWidget);
     expect(find.text('Valentina Ruiz'), findsNothing);
 
-    // Tocar de nuevo el mismo fotógrafo quita el filtro de staff.
     await t.tap(find.text('Mateo R.'));
     await t.pump();
     expect(find.text('Valentina Ruiz'), findsOneWidget);
@@ -67,7 +65,7 @@ void main() {
     expect(find.text('\$670.000'), findsOneWidget);
     expect(find.text('4.5 h'), findsOneWidget);
 
-    await t.tap(find.text('18')); // domingo: el estudio no atiende
+    await t.tap(find.text('18'));
     await t.pump();
     expect(find.text('Sin sesiones agendadas para este día.'), findsOneWidget);
     expect(find.text('\$0'), findsOneWidget);
@@ -82,7 +80,6 @@ void main() {
     expect(find.text('Semana 43'), findsOneWidget);
     expect(find.textContaining('Jueves, 22 de Octubre 2026'), findsOneWidget);
 
-    // Muchas semanas hacia adelante: sigue habiendo datos (no solo la semana actual).
     for (var i = 0; i < 8; i++) {
       await t.tap(find.bySemanticsLabel('Semana siguiente'));
       await t.pump();

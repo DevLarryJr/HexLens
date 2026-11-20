@@ -4,8 +4,6 @@ import '../../models/cliente.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Tarjeta de un cliente del directorio: datos, estado de sus sesiones,
-/// contacto y dos acciones que dependen del estado.
 class ClienteCard extends StatelessWidget {
   const ClienteCard({
     super.key,
@@ -17,7 +15,6 @@ class ClienteCard extends StatelessWidget {
 
   final Cliente cliente;
 
-  /// Línea de detalle del estado (por defecto `cliente.detalle`).
   final String detalle;
   final VoidCallback? onVerFicha;
   final VoidCallback? onAgendar;
@@ -162,7 +159,6 @@ class _Avatar extends StatelessWidget {
   }
 }
 
-/// Recuadro con el estado de las sesiones del cliente.
 class _EstadoBox extends StatelessWidget {
   const _EstadoBox({required this.cliente, required this.detalle});
 

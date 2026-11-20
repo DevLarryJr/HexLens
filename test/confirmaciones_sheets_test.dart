@@ -12,7 +12,6 @@ void main() {
     t.view.physicalSize = const Size(1600, 8000);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
-    // La fuente de pruebas (Ahem) es más ancha que Noto Sans; este test solo mira lógica.
     await t.pumpWidget(MaterialApp(
       theme: buildAppTheme(),
       builder: (context, child) => MediaQuery(
@@ -58,7 +57,6 @@ void main() {
     expect(find.text('Comisión: 30% (\$36.000)'), findsOneWidget);
     expect(find.text('Duración: 45 min'), findsOneWidget);
 
-    // Desmarcar un punto obligatorio bloquea la confirmación.
     await t.tap(find.text('Backup de memoria transferido'));
     await t.pump();
     expect(find.text('Completa los tres primeros puntos del checklist para confirmar.'), findsOneWidget);

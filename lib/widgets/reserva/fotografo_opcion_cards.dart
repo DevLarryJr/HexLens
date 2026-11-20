@@ -4,7 +4,6 @@ import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 import 'servicio_card.dart';
 
-/// Opción "Asignar cualquiera disponible" del paso 2 de la reserva.
 class AutoAsignarCard extends StatelessWidget {
   const AutoAsignarCard({super.key, required this.selected, this.onTap});
 
@@ -54,7 +53,6 @@ class AutoAsignarCard extends StatelessWidget {
   }
 }
 
-/// Fotógrafo disponible y recomendado para el servicio elegido.
 class FotografoRecomendadoCard extends StatelessWidget {
   const FotografoRecomendadoCard({
     super.key,
@@ -70,13 +68,10 @@ class FotografoRecomendadoCard extends StatelessWidget {
 
   final String nombre;
 
-  /// Archivo dentro de `assets/images/`.
   final String foto;
 
-  /// Ej.: "Retratos • Comisión: 30%".
   final String detalle;
 
-  /// Ej.: "Disponible para Retrato profesional".
   final String disponibilidad;
   final String score;
   final String equipo;
@@ -174,7 +169,6 @@ class FotografoRecomendadoCard extends StatelessWidget {
   }
 }
 
-/// Fotógrafo que no puede tomar el servicio (atenuado, foto en grises).
 class FotografoNoDisponibleCard extends StatelessWidget {
   const FotografoNoDisponibleCard({
     super.key,
@@ -186,7 +180,6 @@ class FotografoNoDisponibleCard extends StatelessWidget {
 
   final String nombre;
 
-  /// Archivo dentro de `assets/images/`.
   final String foto;
   final String especialidad;
   final String motivo;

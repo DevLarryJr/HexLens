@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
 
-/// Campo de búsqueda de los catálogos: caja blanca de 48 px con sombra
-/// `hairline`, ícono a la izquierda y borde negro al enfocar.
 class HexSearchField extends StatelessWidget {
   const HexSearchField({
     super.key,
@@ -29,14 +27,11 @@ class HexSearchField extends StatelessWidget {
   final TextInputAction? textInputAction;
   final Widget? suffix;
 
-  /// Por defecto Noto Sans 16 en `onSurface`.
   final TextStyle? textStyle;
 
-  /// Por defecto Noto Sans 16 en `outline`.
   final TextStyle? hintStyle;
   final EdgeInsets iconPadding;
 
-  /// Ancho mínimo de la zona del ícono.
   final double iconMinWidth;
   final double radius;
 
@@ -73,11 +68,9 @@ class HexSearchField extends StatelessWidget {
   }
 }
 
-/// Buscador de una pantalla: crea el controlador ([busqueda]) y lo libera al cerrarla.
 mixin ConBusqueda<T extends StatefulWidget> on State<T> {
   late final busqueda = TextEditingController(text: textoInicial);
 
-  /// Texto con el que arranca el buscador.
   String get textoInicial => '';
 
   @override

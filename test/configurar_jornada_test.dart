@@ -11,7 +11,6 @@ void main() {
     t.view.physicalSize = const Size(1600, 8000);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
-    // La fuente de pruebas (Ahem) es más ancha que Noto Sans; este test solo mira lógica.
     await t.pumpWidget(MaterialApp(
       theme: buildAppTheme(),
       builder: (context, child) => MediaQuery(
@@ -35,7 +34,6 @@ void main() {
 
   testWidgets('Jornada: el sábado carga 09–14 sin almuerzo y el jueves conserva lo editado', (t) async {
     await abrir(t);
-    // Sube el inicio del jueves a 08:30.
     await t.tap(find.byIcon(Icons.keyboard_arrow_up).first);
     await t.pump();
     expect(find.text('08:30 AM'), findsOneWidget);
@@ -55,8 +53,6 @@ void main() {
 
   testWidgets('Jornada: detecta el conflicto si el turno empieza después de la reserva', (t) async {
     await abrir(t);
-    // Laura tiene reservas el jueves 10:00–10:45 y el viernes 09:00; con "aplicar L–V" el turno de ambos
-    // días pasa a empezar 10:30 y las dos quedan en conflicto.
     for (var i = 0; i < 5; i++) {
       await t.tap(find.byIcon(Icons.keyboard_arrow_up).first);
       await t.pump();

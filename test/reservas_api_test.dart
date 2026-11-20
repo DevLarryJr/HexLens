@@ -1,8 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:proyecto_movil/api/api.dart';
-import 'package:proyecto_movil/api/reservas_api.dart';
+import 'package:proyecto_movil/extensions/date_time_extensions.dart';
 import 'package:proyecto_movil/data/mock_agenda.dart';
 import 'package:proyecto_movil/data/mock_clientes.dart';
 import 'package:proyecto_movil/data/mock_servicios.dart';
@@ -10,7 +9,6 @@ import 'package:proyecto_movil/models/sesion.dart';
 
 import 'api_falsa.dart';
 
-/// Inicia sesión en la API falsa con un cliente, un servicio y las reservas dadas, y carga todo.
 Future<void> conectar({List<Map<String, Object?>> reservas = const [], Object? horarios}) async {
   usarApiFalsa(
     clientes: [
@@ -22,17 +20,17 @@ Future<void> conectar({List<Map<String, Object?>> reservas = const [], Object? h
     reservas: reservas,
     horarios: horarios ?? const ['09:00', '10:30', '14:00'],
   );
-  await Api.iniciarSesion(usuarioPrueba, clavePrueba);
+  await iniciarSesion(usuarioPrueba, clavePrueba);
   await sincronizarClientes();
   await sincronizarServicios();
   await sincronizarAgenda();
 }
 
 void main() {
-  tearDown(Api.cerrarSesion);
+  tearDown(SesionActual.cerrar);
 
   test('Formatos de fecha de la API', () {
-    expect(fechaParaApi(DateTime(2026, 10, 30, 10)), '2026-10-30T10:00:00');
+    expect(DateTime(2026, 10, 30, 10).toIsoDateTimeString(), '2026-10-30T10:00:00');
     expect(fechaDesdeApi('2026-10-30 10:00:00'), DateTime(2026, 10, 30, 10));
     expect(fechaDesdeApi('2026-10-30T14:30:00Z'), DateTime(2026, 10, 30, 14, 30));
     expect(fechaDesdeApi('hola'), isNull);
@@ -62,11 +60,35 @@ void main() {
     expect(primera.fotografo, 'Ana López');
     expect(primera.inicio, DateTime(2026, 10, 15, 10));
     expect(primera.precio, 150000);
-    // Solo con ids: el cliente y el servicio se completan con los ya cargados.
     final segunda = sesionesAgenda.last;
     expect(segunda.cliente, 'Larry Sánchez');
     expect(segunda.duracionMin, 60);
     expect(segunda.cancelada, isTrue);
+  });
+
+  test('Reserva con la forma real de la API: día en fecha y hora en horaInicio/horaFin', () async {
+    await conectar(reservas: [
+      {
+        'id': 1,
+        'fecha': '2026-10-23T00:00:00',
+        'horaInicio': '08:30:00',
+        'horaFin': '09:00:00',
+        'clienteId': 1,
+        'servicioId': 2,
+        'profesionalId': 2,
+        'estado': 0,
+        'cliente': {'id': 1, 'nombres': 'Maria Fernanda', 'apellidos': 'Garcia Lopez'},
+        'servicio': {'id': 2, 'nombre': 'Limpieza Facial', 'precio': 20000},
+        'profesional': {'id': 2, 'nombres': 'Ana', 'apellidos': 'Lopez'},
+      },
+    ]);
+    final sesion = sesionesAgenda.single;
+    expect(sesion.inicio, DateTime(2026, 10, 23, 8, 30));
+    expect(sesion.duracionMin, 30);
+    expect(sesion.cliente, 'Maria Fernanda Garcia Lopez');
+    expect(sesion.fotografo, 'Ana Lopez');
+    expect(sesion.precio, 20000);
+    expect(sesion.cancelada, isFalse);
   });
 
   test('Crear, reagendar y cancelar una reserva con la API', () async {
@@ -109,13 +131,13 @@ void main() {
         precio: 120000,
         fotografo: 'Por asignar',
       ),
-      throwsA(isA<ApiError>()),
+      throwsA(isA<ApiException>()),
     );
   });
 
   test('Horarios disponibles: lista de horas o de objetos', () async {
     await conectar();
-    expect(await horariosDisponiblesApi(DateTime(2026, 10, 30), 7),
+    expect(await horariosDisponibles(DateTime(2026, 10, 30), 7),
         [DateTime(2026, 10, 30, 9), DateTime(2026, 10, 30, 10, 30), DateTime(2026, 10, 30, 14)]);
     expect(peticionesRecibidas.last.url.query, 'fecha=2026-10-30&servicioId=7');
 
@@ -123,12 +145,12 @@ void main() {
       {'horaInicio': '2026-10-30T16:00:00', 'profesional': 'Ana'},
       {'hora': '08:30'},
     ]);
-    expect(await horariosDisponiblesApi(DateTime(2026, 10, 30), 7), [DateTime(2026, 10, 30, 8, 30), DateTime(2026, 10, 30, 16)]);
+    expect(await horariosDisponibles(DateTime(2026, 10, 30), 7), [DateTime(2026, 10, 30, 8, 30), DateTime(2026, 10, 30, 16)]);
   });
 
   test('Horarios por profesional: agrega profesionalId a la consulta', () async {
     await conectar();
-    await horariosDisponiblesApi(DateTime(2026, 10, 20), 58, profesionalId: 17);
+    await horariosDisponibles(DateTime(2026, 10, 20), 58, profesionalId: 17);
     expect(peticionesRecibidas.last.url.query, 'fecha=2026-10-20&servicioId=58&profesionalId=17');
   });
 }

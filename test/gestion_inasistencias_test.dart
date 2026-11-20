@@ -28,7 +28,6 @@ void main() {
     t.view.physicalSize = const Size(1600, 8000);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
-    // La fuente de pruebas (Ahem) es más ancha que Noto Sans; este test solo mira lógica.
     await t.pumpWidget(MaterialApp(
       theme: buildAppTheme(),
       builder: (context, child) => MediaQuery(
@@ -38,11 +37,10 @@ void main() {
       home: const GestionInasistenciasScreen(),
     ));
 
-    // Vigentes (por defecto): capacitación futura + licencia en curso.
     expect(find.text('Capacitación Técnica Iluminación Profoto'), findsOneWidget);
     expect(find.text('Licencia Temporal Editorial'), findsOneWidget);
     expect(find.text('Permiso Médico Odontológico'), findsNothing);
-    expect(find.text('0 citas afectadas. '), findsNothing); // va dentro de un Text.rich
+    expect(find.text('0 citas afectadas. '), findsNothing);
     expect(find.textContaining('0 citas afectadas.'), findsOneWidget);
 
     await t.tap(find.text('Historial Pasado'));
@@ -56,6 +54,6 @@ void main() {
     await t.tap(find.text('Liberar Fechas'));
     await t.pump();
     expect(find.text('Capacitación Técnica Iluminación Profoto'), findsNothing);
-    expect(find.text('2'), findsNWidgets(1)); // Todas: 2 (vigentes ahora 1, historial 1)
+    expect(find.text('2'), findsNWidgets(1));
   });
 }

@@ -29,7 +29,6 @@ import 'registrar_cliente_sheet.dart';
 import 'registrar_inasistencia_screen.dart';
 import 'registrar_profesional_screen.dart';
 
-/// Contenedor del rol Admin con la barra inferior: Inicio · Agenda · Clientes · Más.
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
 
@@ -50,12 +49,6 @@ class _HomeShellState extends State<HomeShell> {
 
   void _push(Widget screen, {String? desde}) => Rutas.push(context, screen, desde: desde);
 
-  // ---- Flujos de navegación ----
-
-  /// Nueva reserva en 4 pasos; cada paso pasa lo elegido al siguiente: cliente → servicio → fecha y hora →
-  /// confirmación (que crea la reserva y vuelve a la agenda).
-  /// En cada paso hay dos salidas distintas: la ✕ del header sale de toda la reserva ([_salirDeReserva]) y
-  /// "Volver" (o el atrás del sistema) regresa solo al paso anterior.
   void _nuevaReserva() => _push(
         NuevaReservaClienteScreen(
           onRegistrarCliente: () => showRegistrarClienteSheet(context),
@@ -85,7 +78,6 @@ class _HomeShellState extends State<HomeShell> {
         ),
       );
 
-  /// ✕ de la nueva reserva (pasos 2 a 4): pregunta y vuelve a la pestaña desde la que se empezó.
   Future<void> _salirDeReserva() async {
     final salir = await confirmarSalida(
       context,
@@ -103,7 +95,6 @@ class _HomeShellState extends State<HomeShell> {
     if (mensaje != null) showHexToast(context, mensaje);
   }
 
-  /// Detalle de [s], abierto desde la pestaña actual (Inicio o Agenda): su header dice a cuál vuelve.
   void _abrirSesion(Sesion s) => _push(Rutas.sesionDetalle(context, s), desde: _index == 1 ? 'Agenda' : 'Inicio');
 
   void _horarios() => _push(
@@ -152,7 +143,6 @@ class _HomeShellState extends State<HomeShell> {
         BusquedaGlobalScreen(inicial: inicial, onRegistrar: (_) => _push(const FichaNuevoClienteScreen())),
       );
 
-  /// Menú "Más" de la barra inferior: cada opción cierra el menú y abre su pantalla.
   void _menuMas() {
     final opciones = [
       (Icons.search, 'Búsqueda Global', 'Clientes, servicios y fotógrafos', _busqueda),
@@ -189,8 +179,6 @@ class _HomeShellState extends State<HomeShell> {
 
   @override
   Widget build(BuildContext context) {
-    // Un único Scaffold raíz: las pestañas quedan anidadas y el SnackBar se
-    // dibuja una sola vez (con tres Scaffolds raíz se duplicaba su Hero).
     return Scaffold(
       backgroundColor: AppColors.background,
       bottomNavigationBar: HexBottomNav(currentIndex: _index, onTap: _onTab),
@@ -218,7 +206,6 @@ class _HomeShellState extends State<HomeShell> {
   }
 }
 
-/// Fila del menú "Más": icono en caja gris, título y detalle.
 class _OpcionMenu extends StatelessWidget {
   const _OpcionMenu(this.icono, this.titulo, this.detalle, {required this.onTap});
 

@@ -13,7 +13,6 @@ void main() {
     t.view.physicalSize = const Size(1600, 6000);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
-    // La fuente de pruebas (Ahem) es más ancha que Noto Sans; este test solo mira lógica.
     await t.pumpWidget(MaterialApp(
       theme: buildAppTheme(),
       builder: (context, child) => MediaQuery(
@@ -28,18 +27,15 @@ void main() {
     expect(find.textContaining('#RSV-2026-042'), findsOneWidget);
     expect(find.text('C.C. 1.025.340.890'), findsOneWidget);
 
-    // Días ya pasados (antes de hoy, 15 oct) bloqueados.
     await t.tap(find.text('13'));
     await t.pump();
     expect(find.text('Jueves, 22 de Octubre 2026'), findsOneWidget);
-    // La franja arranca a la misma hora de la sesión original.
     expect(find.text('Sin conflicto en franja de 10:00 AM'), findsOneWidget);
 
     await t.tap(find.text('24'));
     await t.pump();
     expect(find.text('Sábado, 24 de Octubre 2026'), findsOneWidget);
 
-    // Día bloqueado: no cambia la selección.
     await t.tap(find.text('25'));
     await t.pump();
     expect(find.text('Sábado, 24 de Octubre 2026'), findsOneWidget);
@@ -64,7 +60,6 @@ void main() {
     ));
     final sesion = sesionEnGestion;
 
-    // No se puede ir a meses pasados; sí a los siguientes.
     await t.tap(find.bySemanticsLabel('Mes anterior'));
     await t.pump();
     expect(find.text('Octubre 2026'), findsOneWidget);
@@ -86,8 +81,7 @@ void main() {
   });
 
   test('Franjas: ocupadas según la agenda del fotógrafo; domingos y ausencias bloqueados', () {
-    final sesion = sesionesAgenda.firstWhere((s) => s.cliente == 'Valentina Ruiz'); // de Laura Méndez
-    // El viernes 16 Laura tiene una sesión a las 9:00 (90 min): la franja de 9:00 y la de 10:00 se cruzan.
+    final sesion = sesionesAgenda.firstWhere((s) => s.cliente == 'Valentina Ruiz');
     final viernes = franjasReagendar(DateTime(2026, 10, 16), sesion);
     expect(viernes.firstWhere((f) => f.hora == '09:00 AM').bloqueo, 'OCUPADO');
     expect(viernes.firstWhere((f) => f.hora == '05:00 PM').bloqueo, 'CIERRE');

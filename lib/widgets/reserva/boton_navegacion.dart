@@ -3,16 +3,13 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Botón cuadrado blanco de 44 px con un icono (flechas y calendario de la tira de días).
 class BotonNavegacion extends StatelessWidget {
   const BotonNavegacion(this.icon, {super.key, required this.etiqueta, this.onTap, this.ancho = 6.167, this.alto = 10});
 
   final String icon;
 
-  /// Texto para el lector de pantalla.
   final String etiqueta;
 
-  /// Nulo = deshabilitado (se atenúa).
   final VoidCallback? onTap;
   final double ancho;
   final double alto;

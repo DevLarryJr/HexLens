@@ -17,16 +17,15 @@ void main() {
     final fin = await abrir(t);
     await t.pump(const Duration(milliseconds: 2000));
     expect(fin, isEmpty);
-    await t.pump(const Duration(milliseconds: 300)); // termina la animación
-    await t.pump(const Duration(milliseconds: 400)); // y la pausa final
+    await t.pump(const Duration(milliseconds: 300));
+    await t.pump(const Duration(milliseconds: 400));
     expect(fin, [1]);
   });
 
   testWidgets('Splash: si se cierra durante la pausa final no deja temporizadores', (t) async {
     final fin = await abrir(t);
     await t.pump(const Duration(milliseconds: 2000));
-    await t.pump(const Duration(milliseconds: 300)); // ya en la pausa final
-    // Se cierra antes de los 300 ms. Sin cancelar el Timer, el test fallaría con "A Timer is still pending".
+    await t.pump(const Duration(milliseconds: 300));
     await t.pumpWidget(const SizedBox());
     expect(fin, isEmpty);
   });

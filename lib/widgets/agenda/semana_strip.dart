@@ -4,23 +4,18 @@ import '../../theme/app_theme.dart';
 import '../calendario_mensual.dart';
 import '../hex_widgets.dart';
 
-/// Día de la tira semanal.
 class DiaSemana {
   const DiaSemana(this.letra, this.numero, {this.puntos = 0, this.alerta = false, this.domingo = false});
 
-  /// Inicial: L, M, X, J, V, S, D.
   final String letra;
   final int numero;
 
-  /// Puntos bajo el número (sesiones del día, máximo 3).
   final int puntos;
 
-  /// Todos los puntos en rojo.
   final bool alerta;
   final bool domingo;
 }
 
-/// Tira de la semana con el mes, el número de semana y los días seleccionables.
 class SemanaStrip extends StatelessWidget {
   const SemanaStrip({
     super.key,
@@ -34,20 +29,16 @@ class SemanaStrip extends StatelessWidget {
     this.onTitulo,
   });
 
-  /// Ej.: "Octubre 2026".
   final String titulo;
 
-  /// Ej.: "Semana 42".
   final String semana;
   final List<DiaSemana> dias;
   final int seleccion;
   final ValueChanged<int>? onSelect;
 
-  /// Semana anterior / siguiente.
   final VoidCallback? onAnterior;
   final VoidCallback? onSiguiente;
 
-  /// Al tocar el mes (abre el selector de fecha).
   final VoidCallback? onTitulo;
 
   @override

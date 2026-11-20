@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../api/api.dart';
 import '../data/mock_especialidades.dart';
 import '../data/mock_servicios.dart';
 import '../models/especialidad.dart';
+import '../services/local/sesion_actual.dart';
+import '../services/remote/api_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/formato.dart';
 import '../widgets/especialidades/especialidad_cards.dart';
@@ -11,8 +12,6 @@ import '../widgets/hex_form.dart';
 import '../widgets/hex_search_field.dart';
 import '../widgets/hex_widgets.dart';
 
-/// Figma: "HexLens - Catálogo de Especialidades" (41:358).
-/// Con sesión en la API muestra las especialidades reales (`/api/especialidades`).
 class CatalogoEspecialidadesScreen extends StatefulWidget {
   const CatalogoEspecialidadesScreen({super.key, this.onNueva});
 
@@ -27,13 +26,10 @@ class _CatalogoEspecialidadesScreenState extends State<CatalogoEspecialidadesScr
   @override
   Listenable get escuchar => Listenable.merge([revisionEspecialidades, revisionServicios]);
 
-  /// Aviso de la última acción ("Especialidad 'X' eliminada"); null = sin aviso.
   String? _aviso;
 
-  /// Consultando la API al abrir.
   bool _cargando = false;
 
-  /// Error al consultar la API; null si no hubo.
   String? _error;
 
   @override
@@ -42,17 +38,16 @@ class _CatalogoEspecialidadesScreenState extends State<CatalogoEspecialidadesScr
     _recargar();
   }
 
-  /// Trae las especialidades de la API (si hay sesión).
   Future<void> _recargar() async {
-    if (!Api.conectada) return;
+    if (!SesionActual.conectada) return;
     setState(() {
       _cargando = true;
       _error = null;
     });
     try {
       await sincronizarEspecialidades();
-    } on ApiError catch (e) {
-      _error = e.mensaje;
+    } on ApiException catch (e) {
+      _error = e.message;
     } finally {
       if (mounted) setState(() => _cargando = false);
     }
@@ -79,8 +74,8 @@ class _CatalogoEspecialidadesScreenState extends State<CatalogoEspecialidadesScr
     try {
       await eliminarEspecialidad(e);
       if (mounted) setState(() => _aviso = "Especialidad '${e.nombre}' eliminada");
-    } on ApiError catch (error) {
-      if (mounted) showHexToast(context, error.mensaje);
+    } on ApiException catch (error) {
+      if (mounted) showHexToast(context, error.message);
     }
   }
 
@@ -90,8 +85,8 @@ class _CatalogoEspecialidadesScreenState extends State<CatalogoEspecialidadesScr
     try {
       await renombrarEspecialidad(e, nombre);
       if (mounted) setState(() => _aviso = "Especialidad '$nombre' actualizada correctamente");
-    } on ApiError catch (error) {
-      if (mounted) showHexToast(context, error.mensaje);
+    } on ApiException catch (error) {
+      if (mounted) showHexToast(context, error.message);
     }
   }
 
@@ -161,7 +156,6 @@ class _CatalogoEspecialidadesScreenState extends State<CatalogoEspecialidadesScr
   }
 }
 
-/// Diálogo para cambiar el nombre de una especialidad; devuelve el nombre nuevo o null si se cancela.
 class _DialogoNombre extends StatefulWidget {
   const _DialogoNombre(this.actual);
 

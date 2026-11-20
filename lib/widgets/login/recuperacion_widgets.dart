@@ -6,7 +6,6 @@ import '../hex_form.dart';
 import '../hex_widgets.dart';
 import '../../utils/formato.dart';
 
-/// Botón de volver y etiqueta "HEX·AUTH // REC-01".
 class RecuperacionTopBar extends StatelessWidget {
   const RecuperacionTopBar({super.key, this.onBack});
 
@@ -41,7 +40,6 @@ class RecuperacionTopBar extends StatelessWidget {
   }
 }
 
-/// Franja "PROTOCOLO SEGURO", título "RECUPERACIÓN" e instrucciones.
 class RecuperacionEncabezado extends StatelessWidget {
   const RecuperacionEncabezado({super.key});
 
@@ -86,7 +84,6 @@ class RecuperacionEncabezado extends StatelessWidget {
   }
 }
 
-/// Paso 1: ID de operador o correo y botón para emitir el código.
 class SolicitarOtpCard extends StatelessWidget {
   const SolicitarOtpCard({
     super.key,
@@ -150,7 +147,6 @@ class SolicitarOtpCard extends StatelessWidget {
   }
 }
 
-/// Seis casillas del código OTP sobre un campo invisible que recibe el teclado.
 class OtpCasillas extends StatelessWidget {
   const OtpCasillas({super.key, required this.controller, required this.focusNode, this.onChanged});
 
@@ -163,7 +159,6 @@ class OtpCasillas extends StatelessWidget {
     final texto = controller.text;
     return Stack(
       children: [
-        // Campo real invisible que recibe el teclado.
         Opacity(
           opacity: 0,
           child: SizedBox(
@@ -208,7 +203,6 @@ class OtpCasillas extends StatelessWidget {
   }
 }
 
-/// Paso 2: casillas OTP, cuenta atrás para reenviar y botón de validar.
 class ValidarOtpCard extends StatelessWidget {
   const ValidarOtpCard({
     super.key,
@@ -219,13 +213,10 @@ class ValidarOtpCard extends StatelessWidget {
     this.onValidar,
   });
 
-  /// Normalmente [OtpCasillas].
   final Widget casillas;
 
-  /// Segundos que faltan para poder reenviar.
   final int segundos;
 
-  /// Ya hay 6 dígitos.
   final bool completo;
   final VoidCallback? onReenviar;
   final VoidCallback? onValidar;
@@ -307,7 +298,6 @@ class ValidarOtpCard extends StatelessWidget {
   }
 }
 
-/// "REGLA DE CADUCIDAD DE SESIÓN" del código temporal.
 class CaducidadNota extends StatelessWidget {
   const CaducidadNota({super.key});
 

@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
 
-/// Chip de filtro seleccionable. Seleccionado: fondo [selectedColor] (negro)
-/// y texto [selectedForeground] (blanco). Cada pantalla de Figma usa su propia
-/// combinación de radio, relleno y sombra, por eso son parámetros.
 class HexChip extends StatelessWidget {
   const HexChip({
     super.key,
@@ -30,7 +27,6 @@ class HexChip extends StatelessWidget {
   final String label;
   final bool selected;
 
-  /// Tamaño, peso y lineHeight del texto. El color lo pone el chip.
   final TextStyle style;
   final VoidCallback? onTap;
   final Color color;
@@ -40,11 +36,9 @@ class HexChip extends StatelessWidget {
   final double radius;
   final EdgeInsets padding;
 
-  /// Alto fijo con el contenido centrado. Sin él, el alto lo da el contenido.
   final double? height;
   final List<BoxShadow>? shadow;
 
-  /// Sombra cuando está seleccionado. Por defecto la misma que [shadow].
   final List<BoxShadow>? selectedShadow;
   final Widget? leading;
   final double leadingGap;
@@ -78,9 +72,6 @@ class HexChip extends StatelessWidget {
   }
 }
 
-/// Fila horizontal desplazable de chips.
-/// Con [height] usa un `ListView` perezoso de ese alto; sin él, una `Row`
-/// que toma el alto de sus chips.
 class HexChipBar extends StatelessWidget {
   const HexChipBar({
     super.key,

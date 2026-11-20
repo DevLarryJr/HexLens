@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Recuadro "HEX-CRM // V24 — Alta Administrativa de Titular".
 class AltaTitularBanner extends StatelessWidget {
   const AltaTitularBanner({super.key});
 
@@ -41,7 +40,6 @@ class AltaTitularBanner extends StatelessWidget {
   }
 }
 
-/// Selector C.C. / N.I.T. / C.E. de tipo de documento.
 class TipoDocumentoSelector extends StatelessWidget {
   const TipoDocumentoSelector({super.key, required this.selected, required this.onSelect});
 
@@ -74,7 +72,6 @@ class TipoDocumentoSelector extends StatelessWidget {
   }
 }
 
-/// Aviso legal de tratamiento de datos (Ley 1581 de 2012).
 class HabeasDataNota extends StatelessWidget {
   const HabeasDataNota({super.key});
 

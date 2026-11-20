@@ -11,7 +11,6 @@ void main() {
     t.view.physicalSize = const Size(1600, 8000);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
-    // La fuente de pruebas (Ahem) es más ancha que Noto Sans; este test solo mira lógica.
     await t.pumpWidget(MaterialApp(
       theme: buildAppTheme(),
       builder: (context, child) => MediaQuery(
@@ -26,7 +25,6 @@ void main() {
     await abrir(t);
     expect(find.text('3 fotógrafos activos en turno hoy'), findsOneWidget);
     expect(find.text('LICENCIA TEMPORAL'), findsOneWidget);
-    // 09:45: nadie en sesión ni en almuerzo → los tres activos están disponibles.
     expect(find.text('Ver Ficha'), findsNWidgets(3));
 
     await t.tap(find.text('Reactivar'));

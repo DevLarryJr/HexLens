@@ -1,23 +1,18 @@
 import 'package:flutter/material.dart';
 
-import '../api/api.dart';
 import '../data/mock_agenda.dart';
-import '../data/mock_cierres.dart';
-import '../data/mock_clientes.dart';
-import '../data/mock_especialidades.dart';
-import '../data/mock_fotografos.dart';
-import '../data/mock_servicios.dart';
+import '../data/sincronizacion.dart';
+import '../models/login/login_request.dart';
+import '../services/remote/api_service.dart';
+import '../services/remote/login_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/hex_form.dart';
 import '../widgets/hex_widgets.dart';
 import '../widgets/login/login_widgets.dart';
 
-/// Figma: "HexLens - Inicio de Sesión" (19:2)
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.onLogin, this.onRecuperar});
 
-  /// Se llama tras iniciar sesión en la API: `true` si el rol del usuario es Gestor (panel
-  /// administrativo), `false` si no (Mis Servicios).
   final ValueChanged<bool> onLogin;
   final VoidCallback? onRecuperar;
 
@@ -33,14 +28,11 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _remember = true;
   bool _intentado = false;
 
-  /// Esperando la respuesta de la API.
   bool _cargando = false;
 
   bool get _userError => _intentado && _user.text.trim().isEmpty;
   bool get _passwordError => _intentado && _password.text.isEmpty;
 
-  /// Inicia sesión en la API (`POST /api/sesion`) y carga el directorio de clientes.
-  /// El panel al que entra lo decide el rol del usuario en la API, no el selector.
   Future<void> _iniciar() async {
     setState(() => _intentado = true);
     if (_user.text.trim().isEmpty || _password.text.isEmpty) {
@@ -49,30 +41,19 @@ class _LoginScreenState extends State<LoginScreen> {
     }
     setState(() => _cargando = true);
     try {
-      final sesion = await Api.iniciarSesion(_user.text, _password.text);
-      // Datos que se cargan al entrar; si alguno falla se avisa y se sigue con los demás.
-      // Las especialidades van antes que servicios y fotógrafos: dan el nombre de la especialidad de cada uno.
-      final cargas = [
-        ('los clientes', sincronizarClientes),
-        ('las especialidades', sincronizarEspecialidades),
-        ('los servicios', sincronizarServicios),
-        ('los fotógrafos', sincronizarFotografos),
-        // La agenda al final: completa nombres de cliente y servicio con los ya cargados.
-        ('la agenda', sincronizarAgenda),
-        ('los cierres', sincronizarCierres),
-      ];
-      for (final (nombre, cargar) in cargas) {
-        try {
-          await cargar();
-        } on ApiError catch (e) {
-          if (mounted) showHexToast(context, 'No se pudieron cargar $nombre: ${e.mensaje}');
-        }
-      }
+      final sesion = await LoginService().login(
+        LoginRequest(usuario: _user.text, clave: _password.text),
+        recordar: _remember,
+      );
+      final errores = await sincronizarTodo();
       if (!mounted) return;
+      for (final error in errores) {
+        showHexToast(context, error);
+      }
       _password.clear();
       widget.onLogin(sesion.esGestor);
-    } on ApiError catch (e) {
-      if (mounted) showHexToast(context, e.mensaje);
+    } on ApiException catch (e) {
+      if (mounted) showHexToast(context, e.message);
     } finally {
       if (mounted) setState(() => _cargando = false);
     }

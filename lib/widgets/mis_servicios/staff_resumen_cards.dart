@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Aviso "Modo Staff Operativo" de la cabecera de Mis Servicios.
 class ModoStaffBanner extends StatelessWidget {
   const ModoStaffBanner({super.key});
 
@@ -40,7 +39,6 @@ class ModoStaffBanner extends StatelessWidget {
   }
 }
 
-/// Saludo al fotógrafo con su foto, ID, especialidad y cámara asignada.
 class SaludoStaffCard extends StatelessWidget {
   const SaludoStaffCard({
     super.key,
@@ -54,15 +52,12 @@ class SaludoStaffCard extends StatelessWidget {
 
   final String nombre;
 
-  /// "Buenos días", "Buenas tardes"…
   final String saludo;
 
-  /// Archivo dentro de `assets/images/`.
   final String foto;
   final String id;
   final String especialidad;
 
-  /// Ej.: "CAM\n02".
   final String camara;
 
   @override
@@ -155,7 +150,6 @@ class SaludoStaffCard extends StatelessWidget {
   }
 }
 
-/// Número de servicios del período.
 class ContadorServiciosCard extends StatelessWidget {
   const ContadorServiciosCard({super.key, required this.total});
 
@@ -186,15 +180,12 @@ class ContadorServiciosCard extends StatelessWidget {
   }
 }
 
-/// Tarjeta oscura con la próxima sesión del día.
 class ProximaSesionCard extends StatelessWidget {
   const ProximaSesionCard({super.key, required this.titulo, required this.cliente, required this.detalle});
 
-  /// Ej.: "Próxima sesión: Hoy 10:00 AM".
   final String titulo;
   final String cliente;
 
-  /// Ej.: "Retrato profesional • Set A".
   final String detalle;
 
   @override

@@ -11,7 +11,6 @@ void main() {
     t.view.physicalSize = const Size(1600, 8000);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
-    // La fuente de pruebas (Ahem) es más ancha que Noto Sans; este test solo mira lógica.
     await t.pumpWidget(MaterialApp(
       theme: buildAppTheme(),
       builder: (context, child) => MediaQuery(
@@ -26,11 +25,9 @@ void main() {
     expect(find.text('Sesiones día'), findsOneWidget);
     expect(find.text('Realizada'), findsWidgets);
     expect(find.text('11:30 AM - 12:30 PM'), findsOneWidget);
-    expect(find.text('Sesión familiar'), findsOneWidget); // nombre corto del servicio
-    // La sesión cancelada de la agenda no aparece en las reservas de hoy.
+    expect(find.text('Sesión familiar'), findsOneWidget);
     expect(find.textContaining('Cancelada por cliente'), findsNothing);
 
-    // Orden: programadas por hora y la realizada al final.
     final y = [
       for (final c in ['Valentina Ruiz', 'Andrés Molina', 'Camila Pérez', 'Daniel Castro'])
         t.getTopLeft(find.text(c)).dy,

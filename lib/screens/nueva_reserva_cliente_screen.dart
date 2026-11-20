@@ -1,26 +1,22 @@
 import 'package:flutter/material.dart';
 
-import '../api/api.dart';
 import '../data/mock_clientes.dart';
 import '../models/cliente.dart';
+import '../services/local/sesion_actual.dart';
 import '../theme/app_theme.dart';
-import '../widgets/hex_search_field.dart';
 import '../widgets/hex_form.dart';
+import '../widgets/hex_search_field.dart';
 import '../widgets/hex_widgets.dart';
 import '../widgets/reserva/cliente_seleccion.dart';
 
-/// Último trabajo destacado por cliente (no está en el modelo `Cliente`).
 const _ultimoLookbook = {
   'Valentina Ruiz': ('Último lookbook: Editorial\nNeon Y2K', '18 ENE\n2025'),
 };
 
-/// Figma: "HexLens - Nueva Reserva: Cliente" (19:1058)
 class NuevaReservaClienteScreen extends StatefulWidget {
   const NuevaReservaClienteScreen({super.key, this.onContinuar, this.onRegistrarCliente});
 
-  /// Sigue al paso 2 con el cliente elegido.
   final ValueChanged<Cliente>? onContinuar;
-  /// Abre el registro de cliente; si devuelve uno nuevo, queda seleccionado.
   final Future<Cliente?> Function()? onRegistrarCliente;
 
   @override
@@ -31,8 +27,7 @@ class _NuevaReservaClienteScreenState extends State<NuevaReservaClienteScreen> w
   @override
   Listenable get escuchar => revisionClientes;
 
-  /// Nombre del cliente elegido: con la API, el primero del directorio (null si aún no hay clientes).
-  String? _seleccionado = (Api.conectada ? clientes.firstOrNull : clienteEjemplo)?.nombre;
+  String? _seleccionado = (SesionActual.conectada ? clientes.firstOrNull : clienteEjemplo)?.nombre;
 
   Cliente? get _cliente => clientes.where((c) => c.nombre == _seleccionado).firstOrNull ??
       (_seleccionado == clienteEjemplo.nombre ? clienteEjemplo : null);
@@ -55,7 +50,6 @@ class _NuevaReservaClienteScreenState extends State<NuevaReservaClienteScreen> w
     final resultados = clientes.where((c) => c.coincide(busqueda.text)).toList();
 
     return HeaderScaffold(
-      // Primer paso: la ✕ sale de la reserva (aún no hay nada elegido que perder).
       header: HexHeader(title: 'Nueva Reserva', cerrar: true),
       bottomPadding: 128 + 64,
       overlay: Positioned(
@@ -134,7 +128,6 @@ class _NuevaReservaClienteScreenState extends State<NuevaReservaClienteScreen> w
   }
 
   Widget _tarjeta(Cliente c) {
-    // Solo los clientes frecuentes llevan la ficha ampliada (correo y último trabajo), como en Figma.
     final frecuente = c.estado == EstadoCliente.frecuente;
     final lookbook = frecuente ? _ultimoLookbook[c.nombre] : null;
     return ClienteResultadoCard(

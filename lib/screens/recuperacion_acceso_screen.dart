@@ -6,7 +6,6 @@ import '../theme/app_theme.dart';
 import '../widgets/hex_form.dart';
 import '../widgets/login/recuperacion_widgets.dart';
 
-/// Figma: "HexLens - Recuperación de Acceso" (41:2295)
 class RecuperacionAccesoScreen extends StatefulWidget {
   const RecuperacionAccesoScreen({super.key});
 
@@ -24,7 +23,6 @@ class _RecuperacionAccesoScreenState extends State<RecuperacionAccesoScreen> {
   @override
   void initState() {
     super.initState();
-    // El borde de la casilla activa depende del foco.
     _otpFocus.addListener(_alCambiarFoco);
     _iniciarConteo();
   }
@@ -53,7 +51,6 @@ class _RecuperacionAccesoScreenState extends State<RecuperacionAccesoScreen> {
     super.dispose();
   }
 
-  /// Correo ("p.soto@hexlens.studio"), C.C. numérica o ID de operador ("HL-084").
   bool get _correoValido =>
       RegExp(r'^([^@\s]+@[^@\s]+\.[^@\s]+|\d{3,}|#?HL-\d{3})$', caseSensitive: false).hasMatch(_correo.text.trim());
 
@@ -85,7 +82,6 @@ class _RecuperacionAccesoScreenState extends State<RecuperacionAccesoScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(26, 24, 26, 32),
           children: [
-            // Única salida: la flecha de arriba (antes también había "Volver al Inicio de Sesión" al final).
             RecuperacionTopBar(onBack: () => Navigator.of(context).maybePop()),
             const SizedBox(height: 30),
             const RecuperacionEncabezado(),

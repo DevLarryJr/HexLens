@@ -6,7 +6,6 @@ import '../../utils/formato.dart';
 import '../hex_chips.dart';
 import '../hex_widgets.dart';
 
-/// "Servicios y Tarifas": total activo, botón "Nuevo" y aviso de precios en COP.
 class ServiciosCabecera extends StatelessWidget {
   const ServiciosCabecera({super.key, required this.activos, this.onNuevo});
 
@@ -105,7 +104,6 @@ class ServiciosCabecera extends StatelessWidget {
   }
 }
 
-/// Chip de categoría con su número de servicios.
 class CategoriaChip extends StatelessWidget {
   const CategoriaChip({super.key, required this.label, required this.count, required this.selected, this.onTap});
 
@@ -140,13 +138,11 @@ class CategoriaChip extends StatelessWidget {
   }
 }
 
-/// Tarjeta de un servicio del catálogo con su tarifa.
 class ServicioCatalogoCard extends StatelessWidget {
   const ServicioCatalogoCard({super.key, required this.servicio, this.destacado = false, this.onEditar});
 
   final Servicio servicio;
 
-  /// Botón "Editar Tarifa" en negro.
   final bool destacado;
   final VoidCallback? onEditar;
 
@@ -249,7 +245,6 @@ class ServicioCatalogoCard extends StatelessWidget {
   }
 }
 
-/// "REGLA DE INTEGRIDAD HEXLENS".
 class IntegridadNota extends StatelessWidget {
   const IntegridadNota({super.key});
 

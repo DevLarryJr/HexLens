@@ -23,7 +23,6 @@ void main() {
     t.view.physicalSize = const Size(1600, 8000);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
-    // La fuente de pruebas (Ahem) es más ancha que Noto Sans; este test solo mira lógica.
     await t.pumpWidget(MaterialApp(
       theme: buildAppTheme(),
       builder: (context, child) => MediaQuery(
@@ -42,8 +41,7 @@ void main() {
     expect(find.text('Jueves, 15 Oct • 10:00 AM'), findsOneWidget);
     expect(find.text('02:15 - 03:00 PM'), findsOneWidget);
 
-    // Otro servicio: cambian tarifa, duración y fin de los bloques libres.
-    await abrir(t, servicio: 4); // Fotografía de producto, 120 min, $280.000
+    await abrir(t, servicio: 4);
     expect(find.text('\$280.000 COP'), findsOneWidget);
     expect(find.text('120\nMIN'), findsOneWidget);
     expect(find.text('10:00 AM - 12:00 PM'), findsOneWidget);
@@ -57,7 +55,6 @@ void main() {
     expect(find.text('Sesión Daniel Castro'), findsNothing);
     expect(find.text('Sábado, 17 Oct • 10:30 AM'), findsOneWidget);
 
-    // El día pasado no se puede elegir.
     await t.tap(find.text('14'));
     await t.pump();
     expect(find.text('Horarios para Sábado 17'), findsOneWidget);
@@ -66,7 +63,6 @@ void main() {
   testWidgets('Fecha: las flechas recorren los días y el domingo sale cerrado', (t) async {
     final semantica = t.ensureSemantics();
     await abrir(t);
-    // Al abrir no se puede retroceder más allá de ayer.
     await t.tap(find.bySemanticsLabel('Días anteriores'));
     await t.pump();
     expect(find.text('14'), findsOneWidget);
@@ -74,10 +70,10 @@ void main() {
     await t.tap(find.bySemanticsLabel('Días siguientes'));
     await t.pump();
     expect(find.text('14'), findsNothing);
-    expect(find.text('Cerrado'), findsOneWidget); // domingo 18
+    expect(find.text('Cerrado'), findsOneWidget);
     await t.tap(find.text('18'));
     await t.pump();
-    expect(find.text('Horarios para Jueves 15'), findsOneWidget); // no cambia
+    expect(find.text('Horarios para Jueves 15'), findsOneWidget);
 
     await t.tap(find.text('19'));
     await t.pump();

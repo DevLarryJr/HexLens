@@ -1,16 +1,17 @@
 import 'package:flutter/foundation.dart';
 
-import '../api/api.dart';
-import '../api/profesionales_api.dart';
 import '../core/reloj.dart';
 import '../models/especialidad.dart';
 import '../models/fotografo.dart';
+import '../models/profesional/profesional_request.dart';
 import '../models/servicio.dart';
+import '../services/local/sesion_actual.dart';
+import '../services/remote/api_service.dart';
+import '../services/remote/profesionales_api.dart';
 import '../utils/formato.dart';
 import 'mock_especialidades.dart';
 import 'mock_inasistencias.dart';
 
-/// Fotógrafos de ejemplo (sin sesión en la API). Los cierres y comisiones de ejemplo usan estos.
 const fotografosEjemplo = [
   Fotografo(
     nombre: 'Laura Méndez',
@@ -53,54 +54,47 @@ const fotografosEjemplo = [
   ),
 ];
 
-/// Staff de fotógrafos del estudio: los de la API si hay sesión, si no los de ejemplo.
 final List<Fotografo> fotografos = [...fotografosEjemplo];
 
-/// Cambia cada vez que se registra o modifica un fotógrafo.
 final revisionFotografos = ValueNotifier(0);
 
-/// Fotógrafos por id de especialidad ya consultados a la API; se borra cuando cambia el staff.
-final _porEspecialidad = <int, List<Fotografo>>{};
+final _porServicio = <int, List<Fotografo>>{};
 
 void _avisar() {
-  _porEspecialidad.clear();
+  _porServicio.clear();
   revisionFotografos.value++;
 }
 
-/// Fotógrafos activos que pueden atender un servicio de [servicio]: con la API, los de
-/// `GET /api/profesionales/{id}/especialiades` (si la API responde 404, los del staff ya cargado);
-/// sin la API, los del staff local.
 Future<List<Fotografo>> fotografosParaServicio(Servicio servicio) async {
-  final id = servicio.especialidadId;
+  final especialidadId = servicio.especialidadId;
   List<Fotografo> delStaff() => [
         for (final f in fotografos)
-          if (f.activo && (id != null ? f.especialidadId == id : f.especialidad == servicio.categoria)) f,
+          if (f.activo &&
+              (especialidadId != null ? f.especialidadId == especialidadId : f.especialidad == servicio.categoria))
+            f,
       ];
-  if (!Api.conectada || id == null) return delStaff();
-  final consultados = _porEspecialidad[id];
+  final servicioId = servicio.id;
+  if (!SesionActual.conectada || servicioId == null) return delStaff();
+  final consultados = _porServicio[servicioId];
   if (consultados != null) return consultados;
+  final List<Fotografo> deLaApi;
   try {
-    final json = await profesionalesPorEspecialidadApi(id);
-    return _porEspecialidad[id] = [
-      for (final p in json) fotografoDesdeApi(p, nombreEspecialidad: nombreEspecialidad),
-    ].where((f) => f.activo).toList();
-  } on ApiError catch (e) {
-    if (e.estado != 404) rethrow;
-    return delStaff();
+    deLaApi = await ProfesionalesApi().listarPorServicio(servicioId, nombreEspecialidad: nombreEspecialidad);
+  } on ApiException catch (e) {
+    if (e.isNotFound) return delStaff();
+    rethrow;
   }
+  return _porServicio[servicioId] = deLaApi.where((f) => f.activo).toList();
 }
 
-/// Fotógrafo que se muestra en una reserva de [servicio]: el primero de [fotografosParaServicio], o null si no
-/// hay o la API no respondió. Solo es informativo: la reserva no lo envía y la API asigna el definitivo.
 Future<Fotografo?> fotografoSugerido(Servicio servicio) async {
   try {
     return (await fotografosParaServicio(servicio)).firstOrNull;
-  } on ApiError {
+  } on ApiException {
     return null;
   }
 }
 
-/// Fotógrafo por nombre, o null si no está en el staff.
 Fotografo? fotografoPorNombre(String nombre) {
   for (final f in fotografos) {
     if (f.nombre == nombre) return f;
@@ -108,21 +102,17 @@ Fotografo? fotografoPorNombre(String nombre) {
   return null;
 }
 
-/// Fotógrafo de ejemplo por nombre (para los datos de ejemplo que no vienen de la API, como los cierres).
 Fotografo fotografoEjemplo(String nombre) => fotografosEjemplo.firstWhere((f) => f.nombre == nombre);
 
-/// Con sesión en la API, reemplaza el staff por los profesionales de `GET /api/profesionales`.
-/// Lanza [ApiError] si falla.
 Future<void> sincronizarFotografos() async {
-  if (!Api.conectada) return;
-  final deLaApi = await obtenerProfesionalesApi();
+  if (!SesionActual.conectada) return;
+  final deLaApi = await ProfesionalesApi().listar(nombreEspecialidad: nombreEspecialidad);
   fotografos
     ..clear()
-    ..addAll([for (final p in deLaApi) fotografoDesdeApi(p, nombreEspecialidad: nombreEspecialidad)]);
+    ..addAll(deLaApi);
   _avisar();
 }
 
-/// Registra un profesional (en la API si hay sesión) y lo agrega al staff.
 Future<Fotografo> registrarFotografo({
   required String documento,
   required String nombres,
@@ -133,17 +123,17 @@ Future<Fotografo> registrarFotografo({
   required Especialidad especialidad,
 }) async {
   final Fotografo nuevo;
-  if (Api.conectada) {
-    final json = await crearProfesionalApi(profesionalParaApi(
+  if (SesionActual.conectada) {
+    final request = CrearProfesionalRequest(
       documento: documento,
       nombres: nombres,
       apellidos: apellidos,
-      nacimiento: nacimiento,
+      fechaNacimiento: nacimiento,
       porcentaje: comisionPct,
       activo: activo,
       especialidadId: especialidad.id ?? 0,
-    ));
-    nuevo = fotografoDesdeApi(json, nombreEspecialidad: nombreEspecialidad);
+    );
+    nuevo = await ProfesionalesApi().crear(request, nombreEspecialidad: nombreEspecialidad);
   } else {
     nuevo = Fotografo(
       nombre: '${nombres.trim()} ${apellidos.trim()}'.trim(),
@@ -160,7 +150,6 @@ Future<Fotografo> registrarFotografo({
   return nuevo;
 }
 
-/// Reemplaza [f] por una copia con los cambios dados.
 Fotografo _cambiar(Fotografo f, {String? nombres, String? apellidos, int? comisionPct, Especialidad? especialidad, EstadoFotografo? estado}) {
   final nuevosNombres = nombres ?? f.nombres;
   final nuevosApellidos = apellidos ?? f.apellidos;
@@ -186,8 +175,6 @@ Fotografo _cambiar(Fotografo f, {String? nombres, String? apellidos, int? comisi
   return copia;
 }
 
-/// Guarda nombre, comisión y especialidad de [f] (`PUT /api/profesionales/{id}` si hay sesión).
-/// [nombreCompleto] se parte en nombres y apellidos: si termina con sus apellidos actuales, solo cambian los nombres.
 Future<Fotografo> actualizarCondiciones(
   Fotografo f, {
   required String nombreCompleto,
@@ -206,21 +193,24 @@ Future<Fotografo> actualizarCondiciones(
     nombres = partes.first;
     apellidos = partes.skip(1).join(' ');
   }
-  if (Api.conectada && f.id != null) {
-    await actualizarProfesionalApi(f.id!, {
-      'Nombres': nombres,
-      'Apellidos': apellidos,
-      'Porcentaje': comisionPct,
-      if (especialidad.id != null) 'Especialidad': especialidad.id,
-    });
+  if (SesionActual.conectada && f.id != null) {
+    await ProfesionalesApi().actualizar(
+      f.id!,
+      EditarProfesionalRequest(
+        nombres: nombres,
+        apellidos: apellidos,
+        porcentaje: comisionPct,
+        especialidadId: especialidad.id,
+      ),
+    );
   }
   return _cambiar(f, nombres: nombres, apellidos: apellidos, comisionPct: comisionPct, especialidad: especialidad);
 }
 
-/// Activa o inactiva a [f] (`PUT /api/profesionales/{id}` con `{Estado}` si hay sesión). Al activarlo vuelve
-/// a trabajar hoy: también se termina su ausencia vigente (licencia, permiso…), si tenía.
 Future<Fotografo> cambiarEstadoFotografo(Fotografo f, {required bool activo}) async {
-  if (Api.conectada && f.id != null) await actualizarProfesionalApi(f.id!, {'Estado': activo});
+  if (SesionActual.conectada && f.id != null) {
+    await ProfesionalesApi().actualizar(f.id!, EditarProfesionalRequest(activo: activo));
+  }
   if (activo) liberarAusencias(f.nombre, Reloj.hoy);
   return _cambiar(f, estado: activo ? EstadoFotografo.disponible : EstadoFotografo.inactivo);
 }

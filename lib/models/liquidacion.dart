@@ -1,27 +1,39 @@
+import '../extensions/date_time_extensions.dart';
 import '../utils/formato.dart';
+import 'common/json_utils.dart';
 import 'fotografo.dart';
 
-/// Sesión realizada que entra en una liquidación.
 class SesionLiquidada {
   const SesionLiquidada(this.cliente, this.codigo, this.servicio, this.fecha, this.tarifa);
 
+  factory SesionLiquidada.fromJson(Map<String, dynamic> json) {
+    final cliente = primerCampo(json, ['cliente', 'clienteNombre', 'nombreCliente']);
+    final servicio = primerCampo(json, ['servicio', 'servicioNombre', 'nombreServicio']);
+    final id = parseApiInt(primerCampo(json, ['reservaId', 'id']));
+    final fecha = fechaDesdeApi(primerCampo(json, ['fecha', 'fechaReserva', 'fechaHora'])) ?? DateTime(2000);
+    return SesionLiquidada(
+      nombreDe(cliente).isEmpty ? 'Cliente' : nombreDe(cliente),
+      id == null ? '' : '#RSV-${fecha.year}-${id.toString().padLeft(3, '0')}',
+      nombreDe(servicio).isEmpty ? 'Servicio' : nombreDe(servicio),
+      fecha,
+      parseApiInt(primerCampo(json, ['tarifa', 'precio', 'valor', 'total'])) ??
+          (servicio is Map ? parseApiInt(campo(servicio, 'precio')) : null) ??
+          0,
+    );
+  }
+
   final String cliente;
 
-  /// "#RSV-2026-042"
   final String codigo;
 
-  /// "Retrato Profesional"
   final String servicio;
   final DateTime fecha;
 
-  /// Tarifa cobrada, en COP.
   final int tarifa;
 
-  /// "Retrato Profesional • 15 Oct"
   String get detalle => '$servicio • ${diaMes(fecha)}';
 }
 
-/// Comisiones de un fotógrafo en un cierre: base = suma de tarifas, comisión = base × su tasa.
 class Liquidacion {
   const Liquidacion(this.fotografo, this.sesiones);
 
@@ -33,7 +45,6 @@ class Liquidacion {
   int get comision => comisionDe(base);
   int comisionDe(int tarifa) => tarifa * tasa ~/ 100;
 
-  /// Solo las sesiones entre [inicio] y [fin] (ambos incluidos).
   Liquidacion entre(DateTime inicio, DateTime fin) => Liquidacion(fotografo, [
         for (final s in sesiones)
           if (!s.fecha.isBefore(inicio) && !s.fecha.isAfter(fin)) s,

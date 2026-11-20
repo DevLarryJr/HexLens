@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../data/mock_agenda.dart';
 import '../core/reloj.dart';
+import '../data/mock_agenda.dart';
 import '../data/mock_horario.dart';
 import '../models/jornada.dart';
+import '../services/remote/api_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/formato.dart';
+import '../widgets/hex_form.dart';
 import '../widgets/hex_widgets.dart';
 import '../widgets/staff/horario_cards.dart';
 import '../widgets/staff/jornada_dia_card.dart';
@@ -13,7 +15,6 @@ import '../widgets/staff/staff_tabs.dart';
 
 export '../widgets/staff/staff_tabs.dart';
 
-/// Figma: "HexLens - Horario Semanal de Fotógrafo" (19:3644)
 class HorarioSemanalScreen extends StatefulWidget {
   const HorarioSemanalScreen({super.key, this.onInasistencias, this.onConfigurarDia});
 
@@ -27,18 +28,54 @@ class HorarioSemanalScreen extends StatefulWidget {
 class _HorarioSemanalScreenState extends State<HorarioSemanalScreen> {
   int _semanaOffset = 0;
 
-  /// Lunes de la semana visible: la de hoy más el desplazamiento.
   DateTime get _lunes => Reloj.hoy.subtract(Duration(days: Reloj.hoy.weekday - 1)).add(Duration(days: 7 * _semanaOffset));
 
-  static final _pausa = '${Jornada.hhmm(almuerzoInicioMin)} - '
-      '${Jornada.hhmm(almuerzoInicioMin + Jornada.pausaAlmuerzoMin)} (${Jornada.pausaAlmuerzoMin} min)';
+  static String _pausa(Jornada j) {
+    final desde = j.almuerzoInicioMin ?? almuerzoInicioMin;
+    final hasta = j.almuerzoFinMin ?? almuerzoInicioMin + Jornada.pausaAlmuerzoMin;
+    return '${Jornada.hhmm(desde)} - ${Jornada.hhmm(hasta)} (${hasta - desde} min)';
+  }
+
+  void _refrescar() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    revisionJornada.addListener(_refrescar);
+    _cargar();
+  }
+
+  @override
+  void dispose() {
+    revisionJornada.removeListener(_refrescar);
+    super.dispose();
+  }
+
+  Future<void> _cargar() async {
+    final f = fotografoJornada;
+    if (f == null || horariosCargados(f)) return;
+    try {
+      await cargarHorarios(f);
+    } on ApiException catch (e) {
+      if (mounted) showHexToast(context, e.message);
+    }
+  }
+
+  Future<void> _cambiarFotografo() async {
+    final elegido = await elegirFotografoSheet(context, fotografosConJornada, fotografoJornada);
+    if (elegido == null) return;
+    elegirFotografoJornada(elegido);
+    await _cargar();
+  }
 
   @override
   Widget build(BuildContext context) {
     final lunes = _lunes;
-    final semana = semanaLaura(lunes);
+    final fotografo = fotografoJornada;
+    final semana = semanaDe(fotografo, lunes);
     final numero = semanaIso(lunes);
-    // La carga regular no cuenta la media jornada especial ni los días libres.
     final regulares = semana.where((j) => !j.libre && !j.especial).toList();
     final carga = regulares.fold(0, (t, j) => t + j.minutosEfectivos) ~/ 60;
     final sesionesHoy = programadasDeHoy().length;
@@ -52,7 +89,20 @@ class _HorarioSemanalScreenState extends State<HorarioSemanalScreen> {
         const SizedBox(height: 16),
         StaffTabs(current: 0, onTap: (i) => i == 1 ? widget.onInasistencias?.call() : null),
         const SizedBox(height: 16),
-        const StaffPerfilCard(nombre: 'Laura Méndez', foto: 'foto_laura_staff.jpg', detalle: 'Retratos • Sony A7R V'),
+        if (fotografo != null)
+          StaffPerfilCard(
+            nombre: fotografo.nombre,
+            foto: 'foto_laura_staff.jpg',
+            detalle: fotografo.equipo.isEmpty ? fotografo.especialidad : '${fotografo.especialidad} • ${fotografo.equipo}',
+            fotografo: fotografo,
+            onCambiar: _cambiarFotografo,
+          )
+        else
+          const StaffPerfilCard(nombre: 'Laura Méndez', foto: 'foto_laura_staff.jpg', detalle: 'Retratos • Sony A7R V'),
+        if (fotografo != null && !horariosCargados(fotografo)) ...[
+          const SizedBox(height: 12),
+          const LinearProgressIndicator(minHeight: 2),
+        ],
         const SizedBox(height: 16),
         HorarioMetricas(
           carga: '${carga}h',
@@ -71,7 +121,7 @@ class _HorarioSemanalScreenState extends State<HorarioSemanalScreen> {
           JornadaDiaCard(
             jornada: j,
             hoy: mismoDia(j.fecha, Reloj.hoy),
-            pausa: _pausa,
+            pausa: _pausa(j),
             sesionesHoy: sesionesHoy,
             onEditar: widget.onConfigurarDia,
           ),

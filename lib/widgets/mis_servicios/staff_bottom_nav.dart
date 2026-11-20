@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Barra inferior del rol Fotógrafo: Mis Servicios / Mis Comisiones / Mi Cuenta.
 class StaffBottomNav extends StatelessWidget {
   const StaffBottomNav({super.key, required this.seleccion, this.onSelect});
 

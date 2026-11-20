@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../widgets/splash/splash_widgets.dart';
 
-/// Figma: "HexLens - Splash Screen" (41:2750)
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key, required this.onFinished});
 
@@ -21,7 +20,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     duration: const Duration(milliseconds: 2200),
   )..forward();
 
-  /// Pausa breve entre el 100 % y el inicio de sesión; se cancela si la pantalla se cierra antes.
   Timer? _salida;
 
   @override

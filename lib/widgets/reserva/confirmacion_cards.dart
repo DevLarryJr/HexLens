@@ -4,7 +4,6 @@ import '../../theme/app_theme.dart';
 import '../hex_form.dart';
 import '../hex_widgets.dart';
 
-/// Encabezado "PASO 4 DE 4 · Confirmar Reserva · REVISIÓN FINAL" con la barra de progreso.
 class ConfirmacionCabecera extends StatelessWidget {
   const ConfirmacionCabecera({super.key});
 
@@ -67,7 +66,6 @@ class ConfirmacionCabecera extends StatelessWidget {
   }
 }
 
-/// Resumen de la reserva: servicio, titular, horario, fotógrafo y valor total.
 class ResumenReservaCard extends StatelessWidget {
   const ResumenReservaCard({
     super.key,
@@ -89,31 +87,24 @@ class ResumenReservaCard extends StatelessWidget {
 
   final String codigo;
 
-  /// En mayúsculas: "RETRATOS".
   final String categoria;
   final String servicio;
 
-  /// Ej.: "Ciclorama Blanco • 45 min".
   final String lugarDuracion;
   final String clienteIniciales;
   final String clienteNombre;
 
-  /// Ej.: "C.C. 1.025.340.890 (Bogotá D.C.)".
   final String clienteDocumento;
   final String telefono;
   final String email;
 
-  /// Ej.: "Jue, 15 Oct 2026".
   final String fecha;
 
-  /// Ej.: "10:00 AM - 10:45 AM".
   final String horario;
   final String fotografo;
 
-  /// Ej.: "Comisión: 30%".
   final String comision;
 
-  /// Precio formateado sin moneda: "$120.000".
   final String total;
 
   @override
@@ -358,7 +349,6 @@ class _Total extends StatelessWidget {
   }
 }
 
-/// Medio de pago seleccionable (registro de control, no pasarela bancaria).
 class PagoOpcionTile extends StatelessWidget {
   const PagoOpcionTile({
     super.key,

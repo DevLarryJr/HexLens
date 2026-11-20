@@ -5,8 +5,6 @@ import '../../theme/app_theme.dart';
 import '../../utils/formato.dart';
 import '../hex_widgets.dart';
 
-/// Tarjeta de una sesión en la línea de tiempo. Las canceladas usan
-/// [SesionCanceladaCard].
 class SesionCard extends StatelessWidget {
   const SesionCard({super.key, required this.sesion, this.onTap});
 
@@ -35,7 +33,6 @@ class SesionCard extends StatelessWidget {
 
     final precio = formatCop(s.precio ?? 0);
 
-    // En la tarjeta destacada el precio va debajo; en las demás, a la derecha si cabe.
     final footer = Container(
       width: double.infinity,
       padding: const EdgeInsets.all(8),
@@ -126,7 +123,6 @@ class SesionCard extends StatelessWidget {
   }
 }
 
-/// Sesión cancelada: atenuada, con horario, cliente y fotógrafo tachados.
 class SesionCanceladaCard extends StatelessWidget {
   const SesionCanceladaCard({super.key, required this.sesion});
 
@@ -194,7 +190,6 @@ class SesionCanceladaCard extends StatelessWidget {
   }
 }
 
-/// Etiqueta de estado de la sesión: Realizada / Cancelada / Programada.
 class EstadoBadge extends StatelessWidget {
   const EstadoBadge({super.key, required this.sesion});
 

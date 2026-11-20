@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../data/mock_clientes.dart';
-import '../api/api.dart';
 import '../core/reloj.dart';
+import '../data/mock_clientes.dart';
 import '../models/cliente.dart';
+import '../services/remote/api_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/formateadores.dart';
 import '../utils/formato.dart';
@@ -12,7 +12,6 @@ import '../widgets/clientes/ficha_cliente_widgets.dart';
 import '../widgets/hex_form.dart';
 import '../widgets/hex_widgets.dart';
 
-/// Figma: "HexLens - Ficha de Nuevo Cliente (Modal)" (41:1291)
 class FichaNuevoClienteScreen extends StatefulWidget {
   const FichaNuevoClienteScreen({super.key});
 
@@ -45,10 +44,8 @@ class _FichaNuevoClienteScreenState extends State<FichaNuevoClienteScreen> with 
   bool _vacio(TextEditingController c) => _intentado && c.text.trim().isEmpty;
   bool get _emailInvalido => _intentado && !esCorreo(_email.text);
 
-  /// Cliente que ya tiene ese número de documento (se comparan solo los dígitos).
   Cliente? get _duplicado => clientePorDocumento(_doc.text);
 
-  /// Enviando el cliente a la API.
   bool _guardando = false;
 
   Future<void> _confirmar() async {
@@ -66,7 +63,6 @@ class _FichaNuevoClienteScreenState extends State<FichaNuevoClienteScreen> with 
     setState(() => _guardando = true);
     try {
       final cliente = await guardarCliente(
-        // "C.E. / PAS" → "C.E."
         tipoDocumento: TipoDocumentoSelector.tipos[_tipoDoc].split(' ').first,
         documento: _doc.text,
         nombres: _nombres.text,
@@ -78,8 +74,8 @@ class _FichaNuevoClienteScreenState extends State<FichaNuevoClienteScreen> with 
       if (!mounted) return;
       showHexToast(context, 'Cliente ${cliente.nombre} registrado');
       salirSinPreguntar();
-    } on ApiError catch (e) {
-      if (mounted) showHexToast(context, e.mensaje);
+    } on ApiException catch (e) {
+      if (mounted) showHexToast(context, e.message);
     } finally {
       if (mounted) setState(() => _guardando = false);
     }
@@ -232,8 +228,6 @@ class _FichaNuevoClienteScreenState extends State<FichaNuevoClienteScreen> with 
         ),
       ];
 
-  /// Tarjeta de un campo de texto: etiqueta, [antes] (p. ej. el tipo de documento), el campo con
-  /// su [indicativo] opcional a la izquierda y un mensaje por cada error activo de [errores].
   Widget _campo({
     required Widget etiqueta,
     required TextEditingController controller,

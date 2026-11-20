@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Próxima reserva del día, destacada con barra de acento y acciones.
 class ReservaDestacadaCard extends StatelessWidget {
   const ReservaDestacadaCard({
     super.key,
@@ -21,7 +20,6 @@ class ReservaDestacadaCard extends StatelessWidget {
   final String horario;
   final String fotografo;
 
-  /// Precio ya formateado, con moneda.
   final String precio;
   final VoidCallback? onDetalles;
   final VoidCallback? onIniciar;
@@ -104,7 +102,6 @@ class ReservaDestacadaCard extends StatelessWidget {
   }
 }
 
-/// Reserva del día (programada o ya realizada).
 class ReservaHoyCard extends StatelessWidget {
   const ReservaHoyCard({
     super.key,
@@ -122,7 +119,6 @@ class ReservaHoyCard extends StatelessWidget {
   final String horario;
   final String fotografo;
 
-  /// Precio ya formateado, con moneda.
   final String precio;
   final bool realizada;
   final VoidCallback? onGestionar;

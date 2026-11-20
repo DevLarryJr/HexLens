@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../data/mock_agenda.dart';
 import '../core/reloj.dart';
+import '../data/mock_agenda.dart';
 import '../data/mock_fotografos.dart';
 import '../data/mock_inasistencias.dart';
 import '../models/inasistencia.dart';
@@ -11,7 +11,6 @@ import '../widgets/hex_widgets.dart';
 import '../widgets/staff/inasistencia_card.dart';
 import '../widgets/staff/staff_tabs.dart';
 
-/// Figma: "HexLens - Gestión de Inasistencias" (19:4165)
 class GestionInasistenciasScreen extends StatefulWidget {
   const GestionInasistenciasScreen({super.key, this.onRegistrar, this.onJornada});
 
@@ -23,13 +22,10 @@ class GestionInasistenciasScreen extends StatefulWidget {
 }
 
 class _GestionInasistenciasScreenState extends State<GestionInasistenciasScreen> {
-  /// 0 = Todas, 1 = Vigentes / Futuras, 2 = Historial Pasado.
   int _filtro = 1;
 
-  /// Ids de las inasistencias liberadas en esta sesión.
   final _liberadas = <String>{};
 
-  /// Reservas del fotógrafo que caen dentro del periodo de la inasistencia.
   static int _citasAfectadas(Inasistencia i) => sesionesAgenda.where((s) {
         final dia = DateTime(s.inicio.year, s.inicio.month, s.inicio.day);
         return s.fotografo == i.fotografo && !s.cancelada && !dia.isBefore(i.desde) && !dia.isAfter(i.hasta);

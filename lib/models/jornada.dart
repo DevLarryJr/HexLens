@@ -1,6 +1,5 @@
 import '../utils/formato.dart';
 
-/// Jornada de trabajo de un fotógrafo en un día.
 class Jornada {
   const Jornada({
     required this.fecha,
@@ -8,33 +7,38 @@ class Jornada {
     this.finMin,
     this.almuerzo = true,
     this.especial = false,
+    this.almuerzoInicioMin,
+    this.almuerzoFinMin,
   });
 
   final DateTime fecha;
 
-  /// Inicio y fin en minutos desde la medianoche (08:00 → 480). Nulos = día libre.
   final int? inicioMin;
   final int? finMin;
 
-  /// Incluye la pausa técnica de almuerzo ([pausaAlmuerzoMin] minutos).
   final bool almuerzo;
 
-  /// Media jornada especial (no cuenta en la carga regular).
   final bool especial;
+
+  final int? almuerzoInicioMin;
+  final int? almuerzoFinMin;
 
   static const pausaAlmuerzoMin = 60;
 
   bool get libre => inicioMin == null || finMin == null;
 
-  int get minutosEfectivos => libre ? 0 : finMin! - inicioMin! - (almuerzo ? pausaAlmuerzoMin : 0);
+  int get minutosAlmuerzo {
+    if (!almuerzo) return 0;
+    final desde = almuerzoInicioMin, hasta = almuerzoFinMin;
+    return desde != null && hasta != null && hasta > desde ? hasta - desde : pausaAlmuerzoMin;
+  }
 
-  /// "8h"
+  int get minutosEfectivos => libre ? 0 : finMin! - inicioMin! - minutosAlmuerzo;
+
   String get horas => '${minutosEfectivos ~/ 60}h';
 
-  /// "08:00 - 17:00"
   String get horario => libre ? '' : '${hhmm(inicioMin!)} - ${hhmm(finMin!)}';
 
-  /// 780 → "13:00".
   static String hhmm(int min) =>
       '${dosCifras(min ~/ 60)}:${dosCifras(min % 60)}';
 }

@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:proyecto_movil/api/api.dart';
 import 'package:proyecto_movil/data/mock_agenda.dart';
 import 'package:proyecto_movil/data/mock_cierres.dart';
 import 'package:proyecto_movil/data/mock_fotografos.dart';
@@ -10,14 +9,14 @@ import 'package:proyecto_movil/models/cierre.dart';
 import 'api_falsa.dart';
 
 void main() {
-  tearDown(Api.cerrarSesion);
+  tearDown(SesionActual.cerrar);
 
   test('Los cierres son las liquidaciones de la API, del más reciente al más antiguo', () async {
     usarApiFalsa(liquidaciones: [
       {'id': 18, 'fechaInicio': '2026-09-16', 'fechaFin': '2026-09-30', 'totalFacturado': 1850000, 'totalComisiones': 610000, 'cantidadServicios': 12},
       {'Id': 19, 'FechaInicio': '2026-10-01T00:00:00', 'FechaFin': '2026-10-15T00:00:00', 'Total': 300000.0, 'Comisiones': 90000, 'Estado': 'Pagada'},
     ]);
-    await Api.iniciarSesion(usuarioPrueba, clavePrueba);
+    await iniciarSesion(usuarioPrueba, clavePrueba);
     await sincronizarCierres();
     expect(cierres.map((c) => c.codigo), ['#CIE-2026-10A', '#CIE-2026-09B']);
     final octubre = cierres.first;
@@ -29,7 +28,7 @@ void main() {
 
   test('Generar un cierre: POST con fechaInicio y fechaFin', () async {
     usarApiFalsa();
-    await Api.iniciarSesion(usuarioPrueba, clavePrueba);
+    await iniciarSesion(usuarioPrueba, clavePrueba);
     final cierre = await generarCierre(DateTime(2026, 10, 16), DateTime(2026, 10, 31));
     expect(jsonDecode(peticionesRecibidas.last.body), {'fechaInicio': '2026-10-16', 'fechaFin': '2026-10-31'});
     expect(cierre.id, 500);
@@ -50,14 +49,17 @@ void main() {
         {'reservaId': 12, 'cliente': 'Larry Sánchez', 'servicio': 'Sesión de retrato', 'fecha': '2026-10-15T10:00:00', 'valor': 150000},
       ],
     );
-    await Api.iniciarSesion(usuarioPrueba, clavePrueba);
+    await iniciarSesion(usuarioPrueba, clavePrueba);
     await sincronizarFotografos();
     final liquidaciones = await liquidacionesDe(
       Cierre(id: 19, codigo: '#CIE-2026-10A', quincena: 1, inicio: DateTime(2026, 10), fin: DateTime(2026, 10, 15),
           estado: EstadoCierre.auditado, servicios: 1, total: 150000, staff: 60000),
     );
     expect(peticionesRecibidas.map((p) => p.url.toString()),
-        containsAll(['$urlApi/api/comisiones?cierreId=19', '$urlApi/api/comisiones/53/servicios']));
+        containsAll([
+          '${AppConfig.apiBaseUrl}/comisiones?cierreId=19&liquidacionComisionId=19',
+          '${AppConfig.apiBaseUrl}/comisiones/53/servicios',
+        ]));
     final ana = liquidaciones.single;
     expect(ana.fotografo.nombre, 'Ana López');
     expect(ana.tasa, 40);
@@ -74,11 +76,10 @@ void main() {
       reservas: [
         {'id': 1, 'fecha': '2026-10-05T10:00:00', 'estado': 'Atendida', 'cliente': 'Larry Sánchez', 'servicio': {'nombre': 'Retrato', 'precio': 150000, 'duracion': 60}, 'profesional': 'Ana López'},
         {'id': 2, 'fecha': '2026-10-06T10:00:00', 'estado': 'Cancelada', 'cliente': 'X', 'servicio': {'nombre': 'Retrato', 'precio': 150000}, 'profesional': 'Ana López'},
-        // Aún no ocurre (las pruebas corren el 15 oct a las 09:45): queda pendiente, no se liquida.
         {'id': 3, 'fecha': '2026-10-15T11:00:00', 'estado': 'Pendiente', 'cliente': 'Y', 'servicio': {'nombre': 'Retrato', 'precio': 150000}, 'profesional': 'Ana López'},
       ],
     );
-    await Api.iniciarSesion(usuarioPrueba, clavePrueba);
+    await iniciarSesion(usuarioPrueba, clavePrueba);
     await sincronizarFotografos();
     await sincronizarAgenda();
     final previa = liquidacionesEntre(DateTime(2026, 10), DateTime(2026, 10, 15));

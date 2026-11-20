@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Política de reagendamiento: plazo sin penalidad y número al que se envía
-/// la confirmación.
 class PoliticaCard extends StatelessWidget {
   const PoliticaCard({super.key, required this.horasAntelacion, required this.telefono});
 

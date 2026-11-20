@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:proyecto_movil/api/api.dart';
 import 'package:proyecto_movil/data/mock_especialidades.dart';
 import 'package:proyecto_movil/data/mock_fotografos.dart';
 import 'package:proyecto_movil/models/fotografo.dart';
@@ -9,21 +8,24 @@ import 'package:proyecto_movil/models/servicio.dart';
 
 import 'api_falsa.dart';
 
-/// Inicia sesión en la API falsa con una especialidad y los profesionales dados, y los carga.
-Future<void> conectar(List<Map<String, Object?>> profesionales) async {
+Future<void> conectar(
+  List<Map<String, Object?>> profesionales, {
+  List<Map<String, Object?>> servicios = const [],
+}) async {
   usarApiFalsa(
     especialidades: [
       {'id': 15, 'nombre': 'Retratos'},
     ],
+    servicios: servicios,
     profesionales: profesionales,
   );
-  await Api.iniciarSesion(usuarioPrueba, clavePrueba);
+  await iniciarSesion(usuarioPrueba, clavePrueba);
   await sincronizarEspecialidades();
   await sincronizarFotografos();
 }
 
 void main() {
-  tearDown(Api.cerrarSesion);
+  tearDown(SesionActual.cerrar);
 
   test('El staff se llena con los profesionales de la API', () async {
     await conectar([
@@ -38,7 +40,6 @@ void main() {
     expect(ana.comisionPct, 40);
     expect(ana.foto, isNull);
     expect(fotografos.last.estado, EstadoFotografo.inactivo);
-    // Los datos de ejemplo (cierres) siguen encontrando a sus fotógrafos.
     expect(fotografoEjemplo('Laura Méndez').foto, isNotNull);
   });
 
@@ -87,20 +88,21 @@ void main() {
     expect(fotografos.single, same(activa));
   });
 
-  test('Fotógrafo de una reserva: GET /api/profesionales/{especialidad}/especialiades, solo activos', () async {
+  test('Fotógrafo de una reserva: GET /api/profesionales/{servicioId}/especialiades, solo activos', () async {
     await conectar([
       {'id': 18, 'nombres': 'Juan', 'apellidos': 'Pérez', 'porcentaje': 35, 'estado': false, 'especialidad': 15},
       {'id': 17, 'nombres': 'Ana', 'apellidos': 'López', 'porcentaje': 40, 'estado': true, 'especialidad': 15},
       {'id': 19, 'nombres': 'Otro', 'apellidos': 'Más', 'porcentaje': 30, 'estado': true, 'especialidad': 99},
+    ], servicios: [
+      {'id': 58, 'nombre': 'Retrato', 'precio': 150000, 'duracion': 60, 'especialidad': 15},
     ]);
     const retrato = Servicio(
         id: 58, codigo: '#SRV-058', nombre: 'Retrato', categoria: 'Retratos', especialidadId: 15,
         duracionMin: 60, descripcion: '', precio: 150000);
     final sugerido = await fotografoSugerido(retrato);
-    expect(peticionesRecibidas.last.url.path, '/api/profesionales/15/especialiades');
+    expect(peticionesRecibidas.last.url.path, '/api/profesionales/58/especialiades');
     expect(sugerido?.nombre, 'Ana López');
     expect(sugerido?.comisionPct, 40);
-    // La segunda vez no se vuelve a preguntar.
     final antes = peticionesRecibidas.length;
     await fotografosParaServicio(retrato);
     expect(peticionesRecibidas.length, antes);

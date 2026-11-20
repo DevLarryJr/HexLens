@@ -40,6 +40,7 @@ dependencies:
   flutter_svg: ^2.3.0
   shared_preferences: ^2.5.6
   http: ^1.6.0
+  flutter_secure_storage: ^11.2.0
 
 dev_dependencies:
   flutter_test:
@@ -51,6 +52,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: 0.14.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -123,3 +125,25 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# Ícono de la app (logo HexLens). Regenerar con: dart run flutter_launcher_icons
+flutter_launcher_icons:
+  image_path: "assets/branding/app_icon.png"
+  android: "ic_launcher"
+  adaptive_icon_background: "#1C1F1E"
+  adaptive_icon_foreground: "assets/branding/app_icon_foreground.png"
+  ios: true
+  remove_alpha_ios: true
+  background_color_ios: "#1C1F1E"
+  web:
+    generate: true
+    image_path: "assets/branding/app_icon.png"
+    background_color: "#1C1F1E"
+    theme_color: "#F04429"
+  windows:
+    generate: true
+    image_path: "assets/branding/app_icon.png"
+    icon_size: 256
+  macos:
+    generate: true
+    image_path: "assets/branding/app_icon.png"

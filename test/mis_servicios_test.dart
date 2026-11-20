@@ -11,7 +11,6 @@ void main() {
     t.view.physicalSize = const Size(1600, 8000);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
-    // La fuente de pruebas (Ahem) es más ancha que Noto Sans; este test solo mira lógica.
     await t.pumpWidget(MaterialApp(
       theme: buildAppTheme(),
       builder: (context, child) => MediaQuery(
@@ -27,9 +26,9 @@ void main() {
     expect(find.text('Todos (3)'), findsOneWidget);
     expect(find.text('3'), findsOneWidget);
     expect(find.text('Próxima sesión: Hoy 10:00 AM'), findsOneWidget);
-    expect(find.text('\$36.000 COP'), findsOneWidget); // 30 % de $120.000
-    expect(find.text('\$45.000 COP'), findsOneWidget); // 30 % de $150.000
-    expect(find.text('08 Oct 2026'), findsOneWidget); // histórica
+    expect(find.text('\$36.000 COP'), findsOneWidget);
+    expect(find.text('\$45.000 COP'), findsOneWidget);
+    expect(find.text('08 Oct 2026'), findsOneWidget);
   });
 
   testWidgets('Mis servicios: filtros y búsqueda, con aviso si no hay resultados', (t) async {

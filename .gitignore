@@ -49,3 +49,6 @@ app.*.map.json
 
 # Colección de Bruno con tokens y claves reales: nunca subirla
 /Ehily API CECAR - Gestor/
+
+# Archivos temporales de Word
+~$*

@@ -4,8 +4,6 @@ import '../theme/app_theme.dart';
 import '../utils/formato.dart';
 import 'hex_widgets.dart';
 
-/// Calendario de un mes completo (semanas de lunes a domingo) con flechas para cambiar de mes.
-/// Lo usan la vista mensual de la agenda y "Reagendar Sesión".
 class CalendarioMensual extends StatelessWidget {
   const CalendarioMensual({
     super.key,
@@ -23,32 +21,24 @@ class CalendarioMensual extends StatelessWidget {
     this.pie,
   });
 
-  /// Cualquier día del mes que se muestra.
   final DateTime mes;
   final DateTime? seleccionado;
   final DateTime hoy;
   final ValueChanged<DateTime>? onSelect;
 
-  /// Flechas de mes anterior / siguiente; sin callback se ven atenuadas.
   final VoidCallback? onAnterior;
   final VoidCallback? onSiguiente;
 
-  /// Al tocar el título (p. ej. para abrir un selector de fecha).
   final VoidCallback? onTitulo;
 
-  /// Cuántos puntos van bajo cada día (sesiones; se muestran hasta 3).
   final int Function(DateTime dia)? puntos;
 
-  /// Días que no se pueden elegir (pasados, domingos…).
   final bool Function(DateTime dia)? bloqueado;
 
-  /// Día de referencia que se muestra tachado (la fecha original al reagendar).
   final DateTime? original;
 
-  /// Etiqueta junto al título, p. ej. "UTC-5" o "Semana 43".
   final String? etiqueta;
 
-  /// Contenido bajo la grilla.
   final Widget? pie;
 
   static const _diasSemana = ['LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB', 'DOM'];
@@ -196,13 +186,11 @@ class CalendarioMensual extends StatelessWidget {
   }
 }
 
-/// Flecha cuadrada de 36 px para cambiar de semana o de mes; sin [onTap] se ve atenuada.
 class FlechaCalendario extends StatelessWidget {
   const FlechaCalendario(this.icono, {super.key, required this.etiqueta, this.onTap});
 
   final IconData icono;
 
-  /// Texto para el lector de pantalla.
   final String etiqueta;
   final VoidCallback? onTap;
 
@@ -228,7 +216,6 @@ class FlechaCalendario extends StatelessWidget {
   }
 }
 
-/// Franja bajo el calendario con la fecha elegida ("Jueves, 22 de Octubre 2026") y la marca ACTIVO.
 class FechaElegida extends StatelessWidget {
   const FechaElegida(this.fecha, {super.key});
 

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../api/api.dart';
 import '../data/mock_cierres.dart';
 import '../models/cierre.dart';
 import '../models/liquidacion.dart';
+import '../services/remote/api_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/formato.dart';
 import '../widgets/cierres/cierre_cards.dart';
@@ -11,11 +11,9 @@ import '../widgets/cierres/liquidacion_widgets.dart';
 import '../widgets/hex_form.dart';
 import '../widgets/hex_widgets.dart';
 
-/// Figma: "HexLens - Liquidación de Comisiones" (19:4794)
 class LiquidacionComisionesScreen extends StatefulWidget {
   const LiquidacionComisionesScreen({super.key, this.cierre});
 
-  /// Cierre a liquidar. Por defecto, el más reciente.
   final Cierre? cierre;
 
   @override
@@ -23,11 +21,10 @@ class LiquidacionComisionesScreen extends StatefulWidget {
 }
 
 class _LiquidacionComisionesScreenState extends State<LiquidacionComisionesScreen> {
-  int _sel = 1; // 0 = Todos
+  int _sel = 1;
 
   Cierre? get _cierre => widget.cierre ?? cierres.firstOrNull;
 
-  /// Comisiones por fotógrafo (de la API si hay sesión); null mientras se consultan.
   List<Liquidacion>? _liquidaciones;
   String? _error;
 
@@ -50,10 +47,10 @@ class _LiquidacionComisionesScreenState extends State<LiquidacionComisionesScree
     try {
       final liquidaciones = await liquidacionesDe(cierre);
       if (mounted) setState(() => _liquidaciones = liquidaciones);
-    } on ApiError catch (e) {
+    } on ApiException catch (e) {
       if (mounted) {
         setState(() {
-          _error = e.mensaje;
+          _error = e.message;
           _liquidaciones = const [];
         });
       }
@@ -134,7 +131,6 @@ class _LiquidacionComisionesScreenState extends State<LiquidacionComisionesScree
           radius: 2,
           height: 54,
           shadow: AppShadows.medium,
-          // La API no genera comprobantes: se avisa en vez de fingir una exportación.
           onPressed: () => showHexToast(context, 'La exportación a PDF aún no está disponible'),
           leading: const SvgIcon('liquidacion/exportar.svg', width: 13.3, height: 13.3),
           textStyle: AppText.sans(17, weight: FontWeight.w500, color: Colors.white, lineHeight: 22),

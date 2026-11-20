@@ -5,8 +5,6 @@ import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 import 'foto_fotografo.dart';
 
-/// Tarjeta de un fotógrafo del catálogo. Las acciones rápidas cambian según
-/// su estado; los inactivos se muestran atenuados, en grises y tachados.
 class FotografoCard extends StatelessWidget {
   const FotografoCard({
     super.key,
@@ -23,7 +21,6 @@ class FotografoCard extends StatelessWidget {
 
   final Fotografo fotografo;
 
-  /// Estado actual (puede diferir de `fotografo.estado`, p. ej. tras reactivar).
   final EstadoFotografo estado;
   final VoidCallback? onJornada;
   final VoidCallback? onInasistencia;
@@ -32,7 +29,6 @@ class FotografoCard extends StatelessWidget {
   final VoidCallback? onEditarFicha;
   final VoidCallback? onReactivar;
 
-  /// Rótulo de la esquina cuando está inactivo ("LICENCIA TEMPORAL", "INACTIVO"…).
   final String motivoInactivo;
 
   @override
@@ -208,7 +204,6 @@ class FotografoCard extends StatelessWidget {
   }
 }
 
-/// Etiqueta del estado del fotógrafo: En turno / Disponible / Pausa Almuerzo / Inactivo.
 class EstadoFotografoBadge extends StatelessWidget {
   const EstadoFotografoBadge({super.key, required this.estado});
 
@@ -258,7 +253,6 @@ class EstadoFotografoBadge extends StatelessWidget {
   }
 }
 
-/// Comisión pactada y equipo asignado (o registro histórico si está inactivo).
 class _Detalle extends StatelessWidget {
   const _Detalle({required this.fotografo, required this.inactivo});
 

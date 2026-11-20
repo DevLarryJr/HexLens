@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:proyecto_movil/api/api.dart';
 import 'package:proyecto_movil/data/mock_especialidades.dart';
 import 'package:proyecto_movil/data/mock_servicios.dart';
 import 'package:proyecto_movil/screens/crear_servicio_screen.dart';
@@ -24,7 +23,6 @@ void main() {
     t.view.physicalSize = const Size(1600, 8000);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
-    // La fuente de pruebas (Ahem) es más ancha que Noto Sans; este test solo mira lógica.
     await t.pumpWidget(MaterialApp(
       theme: buildAppTheme(),
       builder: (context, child) => MediaQuery(
@@ -46,7 +44,6 @@ void main() {
     expect(find.text('Comisión fotógrafo estimada (30%):'), findsOneWidget);
     expect(find.text('\$42.000 COP'), findsOneWidget);
 
-    // Editorial: Nicolás Vega cobra 40 %.
     await t.tap(find.text('Retratos'));
     await t.pumpAndSettle();
     await t.tap(find.text('Editorial').last);
@@ -62,7 +59,7 @@ void main() {
     usarApiFalsa(especialidades: [
       {'id': 15, 'nombre': 'Retratos'},
     ]);
-    await Api.iniciarSesion(usuarioPrueba, clavePrueba);
+    await iniciarSesion(usuarioPrueba, clavePrueba);
     await sincronizarEspecialidades();
     await abrir(t);
 
@@ -87,6 +84,6 @@ void main() {
     });
     expect(serviciosEstudio.last.nombre, 'Sesión de retrato');
     expect(serviciosEstudio.last.id, 200);
-    await Api.cerrarSesion();
+    await SesionActual.cerrar();
   });
 }

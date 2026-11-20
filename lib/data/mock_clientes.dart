@@ -3,13 +3,14 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../api/api.dart';
-import '../api/clientes_api.dart';
 import '../core/reloj.dart';
 import '../models/cliente.dart';
+import '../models/cliente/crear_cliente_request.dart';
+import '../services/local/sesion_actual.dart';
+import '../services/remote/api_service.dart';
+import '../services/remote/clientes_api.dart';
 import '../utils/formato.dart';
 
-/// Clientes de ejemplo con los que arranca el directorio.
 const _semilla = [
   Cliente(
     nombre: 'Valentina Ruiz',
@@ -51,26 +52,20 @@ const _semilla = [
   ),
 ];
 
-/// Directorio de clientes del estudio: los registrados en este celular (primero, del más
-/// reciente al más antiguo) y luego los de ejemplo. Temporal hasta que se conecte la API.
 final List<Cliente> clientes = [..._semilla];
 
-/// Cliente que muestran por defecto las pantallas de la reserva cuando no se les pasa uno.
 final clienteEjemplo = _semilla.first;
 
-/// Cambia cada vez que se registra un cliente, para que las pantallas abiertas se actualicen.
 final revisionClientes = ValueNotifier(0);
 
-/// Clave del almacenamiento local donde se guardan los clientes registrados.
 const _claveRegistrados = 'clientes_registrados';
 
-/// Carga los clientes registrados en este celular. Se llama una vez al abrir la app.
 Future<void> cargarClientesRegistrados() async {
   final prefs = await SharedPreferences.getInstance();
   final guardados = prefs.getStringList(_claveRegistrados) ?? const [];
   clientes
     ..clear()
-    ..addAll([for (final json in guardados) Cliente.fromJson(jsonDecode(json) as Map<String, dynamic>)])
+    ..addAll([for (final json in guardados) Cliente.fromLocalJson(jsonDecode(json) as Map<String, dynamic>)])
     ..addAll(_semilla);
   revisionClientes.value++;
 }
@@ -78,11 +73,9 @@ Future<void> cargarClientesRegistrados() async {
 Future<void> _guardarRegistrados() async {
   final prefs = await SharedPreferences.getInstance();
   final registrados = clientes.where((c) => c.estado == EstadoCliente.nuevo);
-  await prefs.setStringList(_claveRegistrados, [for (final c in registrados) jsonEncode(c.toJson())]);
+  await prefs.setStringList(_claveRegistrados, [for (final c in registrados) jsonEncode(c.toLocalJson())]);
 }
 
-/// Crea un cliente nuevo (sin sesiones) con los datos de un formulario de registro y lo agrega
-/// al inicio del directorio, guardándolo en el celular. [tipoDocumento] es "C.C.", "N.I.T." o "C.E.".
 Cliente registrarCliente({
   required String tipoDocumento,
   required String documento,
@@ -105,19 +98,15 @@ Cliente registrarCliente({
   return cliente;
 }
 
-/// Con sesión en la API, reemplaza el directorio por los clientes de la API (`GET /api/clientes`).
-/// Lanza [ApiError] si falla; el directorio queda como estaba.
 Future<void> sincronizarClientes() async {
-  if (!Api.conectada) return;
-  final deLaApi = await obtenerClientesApi();
+  if (!SesionActual.conectada) return;
+  final deLaApi = await ClientesApi().listar();
   clientes
     ..clear()
     ..addAll(deLaApi);
   revisionClientes.value++;
 }
 
-/// Registra un cliente desde un formulario: en la API si hay sesión (`POST /api/clientes`) o, si no,
-/// solo en el celular ([registrarCliente]). Lanza [ApiError] si la API lo rechaza.
 Future<Cliente> guardarCliente({
   required String tipoDocumento,
   required String documento,
@@ -127,7 +116,7 @@ Future<Cliente> guardarCliente({
   String email = '',
   DateTime? nacimiento,
 }) async {
-  if (!Api.conectada) {
+  if (!SesionActual.conectada) {
     return registrarCliente(
       tipoDocumento: tipoDocumento,
       documento: documento,
@@ -137,25 +126,29 @@ Future<Cliente> guardarCliente({
       email: email,
     );
   }
-  // La API puede tener clientes que este celular aún no ha descargado: se pregunta antes de crear.
-  final existente = await buscarClientePorDocumentoApi(documento);
+  final clientesApi = ClientesApi();
+  final existente = await clientesApi.consultar(documento);
   if (existente != null) {
-    throw ApiError('Ya existe un cliente con ese documento (${existente.nombre})', codigo: 'CLIENT_EXISTS');
+    throw ApiException(
+      'Ya existe un cliente con ese documento (${existente.nombre})',
+      statusCode: 409,
+      data: const {'code': 'CLIENT_EXISTS'},
+    );
   }
-  final cliente = await crearClienteApi(clienteParaApi(
+  final request = CrearClienteRequest(
     documento: documento,
     nombres: nombres,
     apellidos: apellidos,
     celular: telefono,
     correo: email,
-    nacimiento: nacimiento,
-  ));
+    fechaNacimiento: nacimiento,
+  );
+  final cliente = await clientesApi.crear(request);
   clientes.insert(0, cliente);
   revisionClientes.value++;
   return cliente;
 }
 
-/// Cliente por nombre, o null si no está en el directorio.
 Cliente? clientePorNombre(String nombre) {
   for (final c in clientes) {
     if (c.nombre == nombre) return c;
@@ -163,7 +156,6 @@ Cliente? clientePorNombre(String nombre) {
   return null;
 }
 
-/// Cliente con ese número de documento (se comparan solo los dígitos), o null.
 Cliente? clientePorDocumento(String documento) {
   final digitos = soloDigitos(documento);
   if (digitos.isEmpty) return null;

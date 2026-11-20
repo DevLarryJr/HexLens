@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../api/api.dart';
-import '../api/reservas_api.dart';
 import '../core/reloj.dart';
 import '../data/mock_agenda.dart';
 import '../data/mock_clientes.dart';
@@ -9,6 +7,8 @@ import '../data/mock_fotografos.dart';
 import '../data/mock_reagendar.dart';
 import '../models/franja_horaria.dart';
 import '../models/sesion.dart';
+import '../services/local/sesion_actual.dart';
+import '../services/remote/api_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/formato.dart';
 import '../widgets/calendario_mensual.dart';
@@ -19,11 +19,9 @@ import '../widgets/reagendar/franja_grid.dart';
 import '../widgets/reagendar/politica_card.dart';
 import '../widgets/reagendar/staff_selector.dart';
 
-/// Figma: "HexLens - Reagendar Sesión" (41:971)
 class ReagendarSesionScreen extends StatefulWidget {
   const ReagendarSesionScreen({super.key, this.sesion});
 
-  /// Sesión que se reagenda. Por defecto, la sesión en gestión ([sesionEnGestion]).
   final Sesion? sesion;
 
   @override
@@ -33,19 +31,15 @@ class ReagendarSesionScreen extends StatefulWidget {
 class _ReagendarSesionScreenState extends State<ReagendarSesionScreen> with ProtegeCambios {
   late final _sesion = widget.sesion ?? sesionEnGestion;
 
-  /// La franja que se elige sola (al abrir o al cargar horarios) no cuenta como cambio; la que toca el usuario sí.
   bool _eligioFranja = false;
 
   @override
   String get firmaFormulario => '$_dia|$_staff|${_eligioFranja ? _slot : ''}';
 
-  /// Con sesión en la API, los horarios libres salen de `GET /api/agenda` (no de la agenda de ejemplo).
-  bool get _usaApi => Api.conectada && _sesion.servicioId != null;
+  bool get _usaApi => SesionActual.conectada && _sesion.servicioId != null;
 
-  /// Horas libres del día elegido según la API; null mientras se consultan.
   List<DateTime>? _libresApi;
 
-  /// Enviando el cambio a la API.
   bool _guardando = false;
 
   @override
@@ -61,25 +55,22 @@ class _ReagendarSesionScreenState extends State<ReagendarSesionScreen> with Prot
       _slot = -1;
     });
     try {
-      // Las horas libres del fotógrafo que ya tiene la sesión (si está en el staff cargado).
-      final horas = await horariosDisponiblesApi(_dia, _sesion.servicioId!,
+      final horas = await horariosDisponibles(_dia, _sesion.servicioId!,
           profesionalId: fotografoPorNombre(_sesion.fotografo)?.id);
       if (!mounted) return;
       setState(() {
         _libresApi = horas;
         _slot = _primeraLibre();
       });
-    } on ApiError catch (e) {
+    } on ApiException catch (e) {
       if (!mounted) return;
       setState(() => _libresApi = const []);
-      showHexToast(context, e.mensaje);
+      showHexToast(context, e.message);
     }
   }
 
-  /// Día elegido: por defecto el primero disponible desde el mismo día de la semana siguiente.
   late DateTime _dia = _primerDisponible(_sumar(_soloFecha(_sesion.inicio), 7));
 
-  /// Mes que muestra el calendario.
   late DateTime _mes = _dia;
   late int _slot = _primeraLibre();
   int _staff = 0;
@@ -101,7 +92,6 @@ class _ReagendarSesionScreenState extends State<ReagendarSesionScreen> with Prot
       ? [for (final h in _libresApi ?? const <DateTime>[]) FranjaHoraria(horaAmPm(h), inicio: h)]
       : franjasReagendar(_dia, _sesion);
 
-  /// La franja libre a la misma hora de la sesión original o, si no hay, la primera libre (−1 si ninguna).
   int _primeraLibre() {
     final franjas = _franjas;
     final misma = franjas.indexWhere((f) =>
@@ -117,7 +107,6 @@ class _ReagendarSesionScreenState extends State<ReagendarSesionScreen> with Prot
     _cargarHorarios();
   }
 
-  /// Muestra el mes [paso] meses antes o después, entre el mes actual y [mesesReagendar] hacia adelante.
   bool _puedeIrA(int paso) {
     final destino = DateTime(_mes.year, _mes.month + paso);
     return !destino.isBefore(DateTime(Reloj.hoy.year, Reloj.hoy.month)) &&
@@ -133,8 +122,8 @@ class _ReagendarSesionScreenState extends State<ReagendarSesionScreen> with Prot
       if (!mounted) return;
       showHexToast(context, 'Sesión reagendada: ${fechaLarga(nueva.inicio)} • ${franja.hora}');
       salirSinPreguntar();
-    } on ApiError catch (e) {
-      if (mounted) showHexToast(context, e.mensaje);
+    } on ApiException catch (e) {
+      if (mounted) showHexToast(context, e.message);
     } finally {
       if (mounted) setState(() => _guardando = false);
     }
@@ -225,7 +214,6 @@ class _ReagendarSesionScreenState extends State<ReagendarSesionScreen> with Prot
     ));
   }
 
-  /// Solo la acción principal: salir sin reagendar es la ✕ del header.
   Widget _actionBar() {
     return BlurBottomBar(
       child: HexButton(

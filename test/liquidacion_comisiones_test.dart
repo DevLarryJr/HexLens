@@ -12,7 +12,6 @@ void main() {
     t.view.physicalSize = const Size(1600, 12000);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
-    // La fuente de pruebas (Ahem) es más ancha que Noto Sans; este test solo mira lógica.
     await t.pumpWidget(MaterialApp(
       theme: buildAppTheme(),
       builder: (context, child) => MediaQuery(
@@ -21,7 +20,7 @@ void main() {
       ),
       home: const LiquidacionComisionesScreen(),
     ));
-    await t.pumpAndSettle(); // las comisiones se cargan al abrir
+    await t.pumpAndSettle();
   }
 
   String formula(WidgetTester t) => t
@@ -45,6 +44,6 @@ void main() {
     await t.pump();
     expect(find.byType(LiquidacionResumenCard), findsNWidgets(3));
     expect(formula(t), contains('(según cada contrato)'));
-    expect(find.textContaining('\$96.000', findRichText: true), findsOneWidget); // Sara
+    expect(find.textContaining('\$96.000', findRichText: true), findsOneWidget);
   });
 }

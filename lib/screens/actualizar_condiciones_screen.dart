@@ -1,25 +1,20 @@
 import 'package:flutter/material.dart';
 
-import '../api/api.dart';
 import '../data/mock_especialidades.dart';
 import '../data/mock_fotografos.dart';
 import '../models/fotografo.dart';
+import '../services/remote/api_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/condiciones/condiciones_widgets.dart';
 import '../widgets/hex_form.dart';
 import '../widgets/hex_widgets.dart';
 
-/// Figma: "HexLens - Error de Validación en Formulario" (41:791).
-/// Formulario de condiciones del fotógrafo con validación en vivo; se abre
-/// mostrando el estado de error del diseño (nombre vacío y comisión 125%).
 class ActualizarCondicionesScreen extends StatefulWidget {
   const ActualizarCondicionesScreen({super.key, this.nombre = '', this.comision = '125', this.fotografo});
 
   final String nombre;
   final String comision;
 
-  /// Fotógrafo a editar: rellena nombre, C.C., comisión y especialidad.
-  /// Sin él se muestra el estado de error del diseño.
   final Fotografo? fotografo;
 
   @override
@@ -34,8 +29,6 @@ class _ActualizarCondicionesScreenState extends State<ActualizarCondicionesScree
   late final _comision = TextEditingController(text: widget.fotografo?.comisionPct.toString() ?? widget.comision);
   late String _especialidad = widget.fotografo?.especialidad ?? _especialidades.firstOrNull ?? '';
 
-  /// Especialidades activas del estudio.
-  /// Nombres de las especialidades (de la API si hay sesión).
   static List<String> get _especialidades => [for (final e in especialidades) e.nombre];
 
   @override
@@ -50,10 +43,8 @@ class _ActualizarCondicionesScreenState extends State<ActualizarCondicionesScree
   bool get _comisionError => _pct == null || _pct! < 0 || _pct! > 100;
   int get _errores => (_nombreError ? 1 : 0) + (_comisionError ? 1 : 0);
 
-  /// Enviando a la API.
   bool _guardando = false;
 
-  /// Guarda nombre, comisión y especialidad del fotógrafo (`PUT /api/profesionales/{id}` si hay sesión).
   Future<void> _guardar() async {
     if (_errores > 0) {
       showHexToast(context, 'Corrige $_errores ${_errores == 1 ? 'campo' : 'campos'} antes de guardar');
@@ -73,8 +64,8 @@ class _ActualizarCondicionesScreenState extends State<ActualizarCondicionesScree
       if (!mounted) return;
       showHexToast(context, 'Condiciones de ${_nombre.text.trim()} guardadas');
       salirSinPreguntar();
-    } on ApiError catch (e) {
-      if (mounted) showHexToast(context, e.mensaje);
+    } on ApiException catch (e) {
+      if (mounted) showHexToast(context, e.message);
     } finally {
       if (mounted) setState(() => _guardando = false);
     }

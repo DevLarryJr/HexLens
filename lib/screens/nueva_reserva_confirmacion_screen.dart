@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../api/api.dart';
 import '../core/reloj.dart';
 import '../data/mock_agenda.dart';
 import '../data/mock_clientes.dart';
@@ -11,13 +10,14 @@ import '../models/cliente.dart';
 import '../models/fotografo.dart';
 import '../models/servicio.dart';
 import '../models/sesion.dart';
+import '../services/local/sesion_actual.dart';
+import '../services/remote/api_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/formato.dart';
 import '../widgets/hex_form.dart';
 import '../widgets/hex_widgets.dart';
 import '../widgets/reserva/confirmacion_cards.dart';
 
-/// Figma: "HexLens - Nueva Reserva: Confirmación" (19:1810)
 class NuevaReservaConfirmacionScreen extends StatefulWidget {
   const NuevaReservaConfirmacionScreen({
     super.key,
@@ -31,21 +31,16 @@ class NuevaReservaConfirmacionScreen extends StatefulWidget {
     this.codigo = '#RSV-NUEVA',
   });
 
-  /// Se llama con la reserva ya creada (en la API si hay sesión).
   final ValueChanged<Sesion>? onConfirmada;
 
-  /// ✕ del header: sale de toda la reserva sin crearla. "Volver a Fecha y hora" regresa al paso anterior.
   final VoidCallback? onSalir;
 
-  /// Datos elegidos en los pasos anteriores. Por defecto, la reserva de
-  /// ejemplo: Valentina Ruiz · Retrato profesional · Laura Méndez · hoy 10:00.
   final Cliente? cliente;
   final Servicio? servicio;
   final Fotografo? fotografo;
   final DateTime? inicio;
   final String lugar;
 
-  /// Código que se muestra antes de crearla (la API asigna el definitivo).
   final String codigo;
 
   @override
@@ -55,12 +50,10 @@ class NuevaReservaConfirmacionScreen extends StatefulWidget {
 class _NuevaReservaConfirmacionScreenState extends State<NuevaReservaConfirmacionScreen> {
   int _pago = 0;
 
-  /// Enviando la reserva a la API.
   bool _guardando = false;
 
   Servicio get _servicio => widget.servicio ?? serviciosReserva.firstOrNull ?? servicioEjemplo;
 
-  /// Fotógrafo de la reserva: el recibido o el de la especialidad del servicio (de la API si hay sesión).
   late Fotografo? _fotografo = widget.fotografo;
 
   @override
@@ -88,8 +81,8 @@ class _NuevaReservaConfirmacionScreenState extends State<NuevaReservaConfirmacio
         fotografo: f?.nombre ?? 'Por asignar',
       );
       widget.onConfirmada?.call(reserva);
-    } on ApiError catch (e) {
-      if (mounted) showHexToast(context, e.mensaje);
+    } on ApiException catch (e) {
+      if (mounted) showHexToast(context, e.message);
     } finally {
       if (mounted) setState(() => _guardando = false);
     }
@@ -99,8 +92,7 @@ class _NuevaReservaConfirmacionScreenState extends State<NuevaReservaConfirmacio
   Widget build(BuildContext context) {
     final c = widget.cliente ?? clienteEjemplo;
     final s = _servicio;
-    // Con la API el estudio asigna el fotógrafo al crear la reserva: sin uno conocido se muestra así.
-    final f = _fotografo ?? (Api.conectada ? null : fotografos.firstOrNull ?? fotografosEjemplo.first);
+    final f = _fotografo ?? (SesionActual.conectada ? null : fotografos.firstOrNull ?? fotografosEjemplo.first);
     final inicio = widget.inicio ?? Reloj.hoy.add(const Duration(hours: 10));
     final fin = inicio.add(Duration(minutes: s.duracionMin));
 
@@ -138,7 +130,6 @@ class _NuevaReservaConfirmacionScreenState extends State<NuevaReservaConfirmacio
           trailing: const SvgIcon('confirm/arrow_forward.svg', width: 12),
         ),
         const SizedBox(height: 8),
-        // Paso anterior (igual que el atrás del sistema). Salir de la reserva es la ✕ del header.
         Center(
           child: TextButton.icon(
             onPressed: () => Navigator.of(context).maybePop(),

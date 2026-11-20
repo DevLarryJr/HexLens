@@ -4,8 +4,6 @@ import '../../models/franja_horaria.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Grilla de franjas horarias en dos columnas, con leyenda arriba y la
-/// franja elegida abajo.
 class FranjaGrid extends StatelessWidget {
   const FranjaGrid({
     super.key,
@@ -19,10 +17,8 @@ class FranjaGrid extends StatelessWidget {
   final List<FranjaHoraria> franjas;
   final int seleccion;
 
-  /// Ej.: "Franja seleccionada: 11:30 AM (45 min)".
   final String resumen;
 
-  /// Ej.: "Cabina 02\nLibre".
   final String cabina;
   final ValueChanged<int>? onSelect;
 
@@ -95,7 +91,6 @@ class FranjaGrid extends StatelessWidget {
         child: Row(
           children: [
             if (selected) ...[const SvgIcon('reagendar/check_circle.svg', width: 15), const SizedBox(width: 6)],
-            // La hora en una línea ("11:30 AM"); si no cabe junto a la etiqueta se reduce un poco en vez de partirse.
             Expanded(
               child: FittedBox(
                 fit: BoxFit.scaleDown,
@@ -113,8 +108,6 @@ class FranjaGrid extends StatelessWidget {
                 ),
               ),
             ),
-            // La franja elegida ya se distingue por el fondo negro y el check; sin la etiqueta "ELEGIDO"
-            // la hora cabe completa.
             if (disabled) ...[
               const SizedBox(width: 6),
               Text(

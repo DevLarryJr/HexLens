@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// "HEX-MOD // CATÁLOGO OPERATIVO", título y descripción. Sin botón cerrar: la hoja se cierra con "Cancelar"
-/// o deslizándola hacia abajo.
 class NuevaEspecialidadCabecera extends StatelessWidget {
   const NuevaEspecialidadCabecera({super.key});
 

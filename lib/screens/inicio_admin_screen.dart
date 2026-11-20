@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../data/mock_agenda.dart';
 import '../core/reloj.dart';
+import '../data/mock_agenda.dart';
 import '../models/sesion.dart';
 import '../theme/app_theme.dart';
 import '../utils/formato.dart';
@@ -12,7 +12,6 @@ import '../widgets/inicio/nueva_reserva_banner.dart';
 import '../widgets/inicio/reserva_hoy_card.dart';
 import '../widgets/inicio/saludo_admin.dart';
 
-/// Figma: "HexLens - Inicio Administrativo" (19:730)
 class InicioAdminScreen extends StatelessWidget {
   const InicioAdminScreen({
     super.key,
@@ -27,21 +26,18 @@ class InicioAdminScreen extends StatelessWidget {
 
   final Widget? bottomBar;
   final VoidCallback onNuevaReserva;
-  /// Abre el detalle de la sesión tocada.
   final ValueChanged<Sesion> onAbrirSesion;
   final VoidCallback? onEspecialidades;
   final VoidCallback? onServicios;
   final VoidCallback? onFotografos;
   final VoidCallback? onCierres;
 
-  /// Sesiones no canceladas de hoy: programadas por hora y al final las realizadas.
   static List<Sesion> get _deHoy {
     final hoy = sesionesAgenda.where((s) => mismoDia(s.inicio, Reloj.hoy) && !s.cancelada).toList();
     int orden(Sesion s) => s.estado == SesionEstado.realizada ? 1 : 0;
     return hoy..sort((a, b) => orden(a) != orden(b) ? orden(a) - orden(b) : a.inicio.compareTo(b.inicio));
   }
 
-  // Se redibuja cuando cambia la agenda (p. ej. al reagendar una sesión de hoy).
   @override
   Widget build(BuildContext context) => ListenableBuilder(listenable: revisionAgenda, builder: _contenido);
 
@@ -153,7 +149,6 @@ class InicioAdminScreen extends StatelessWidget {
   }
 }
 
-/// Título de sección (20 px) con ícono opcional y un dato a la derecha.
 class _Titulo extends StatelessWidget {
   const _Titulo(this.texto, {this.leading, required this.trailing});
 

@@ -5,8 +5,6 @@ import '../../theme/app_theme.dart';
 import '../../utils/formato.dart';
 import '../hex_widgets.dart';
 
-/// Tarjeta de un servicio asignado al fotógrafo. Tiene tres variantes:
-/// programada (hoy), realizada hoy e histórica (días anteriores).
 class ServicioStaffCard extends StatelessWidget {
   const ServicioStaffCard({
     super.key,
@@ -18,7 +16,6 @@ class ServicioStaffCard extends StatelessWidget {
 
   final Sesion sesion;
 
-  /// Fecha de referencia para distinguir "hoy" de "histórica".
   final DateTime hoy;
   final int comisionPct;
   final VoidCallback? onVerFicha;
@@ -26,7 +23,6 @@ class ServicioStaffCard extends StatelessWidget {
   bool get _programada => sesion.estado == SesionEstado.programada;
   bool get _historica => !_programada && !mismoDia(sesion.inicio, hoy);
 
-  /// Ícono según el tipo de servicio.
   Widget get _icono {
     final nombre = sesion.descripcion.toLowerCase();
     if (nombre.contains('graduación')) {

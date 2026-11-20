@@ -4,7 +4,6 @@ import '../../models/bloque_horario.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Bloque de horario del día: libre (seleccionable), ocupado, almuerzo o ya pasado.
 class BloqueTile extends StatelessWidget {
   const BloqueTile({
     super.key,
@@ -15,7 +14,6 @@ class BloqueTile extends StatelessWidget {
     this.onTap,
   });
 
-  /// Ej.: "10:00 - 10:45 AM".
   final String horario;
   final String nota;
   final BloqueTipo tipo;

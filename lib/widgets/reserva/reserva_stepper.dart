@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Stepper de 4 pasos con círculos numerados (pasos 2 a 4 del flujo de reserva)
-/// y resumen del cliente seleccionado.
 class ReservaStepper extends StatelessWidget {
   const ReservaStepper({
     super.key,
@@ -13,7 +11,6 @@ class ReservaStepper extends StatelessWidget {
     required this.documento,
   });
 
-  /// Índice 0..3 del paso activo.
   final int current;
   final String cliente;
   final String documento;
@@ -103,7 +100,6 @@ class ReservaStepper extends StatelessWidget {
                           style: AppText.sans(14, color: AppColors.onSurfaceVariant, lineHeight: 18)),
                       Text.rich(
                         TextSpan(children: [
-                          // Nombre y documento en líneas separadas: juntos no caben y se cortaban con "…".
                           TextSpan(
                               text: '$cliente\n',
                               style: AppText.sans(16, weight: FontWeight.w600, lineHeight: 24)),

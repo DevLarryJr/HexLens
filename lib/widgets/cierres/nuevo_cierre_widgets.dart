@@ -7,11 +7,9 @@ import '../fotografos/foto_fotografo.dart';
 import '../hex_widgets.dart';
 import 'cierre_cards.dart';
 
-/// "PASO N DE 2 // CONSOLIDACIÓN" junto a "MODO AUDITORÍA".
 class PasoAuditoriaHeader extends StatelessWidget {
   const PasoAuditoriaHeader({super.key, required this.paso});
 
-  /// "PASO 1 DE 2 // CONSOLIDACIÓN"
   final String paso;
 
   @override
@@ -30,7 +28,6 @@ class PasoAuditoriaHeader extends StatelessWidget {
   }
 }
 
-/// "Rango de Liquidación": fechas inicial y final con su validación.
 class RangoLiquidacionCard extends StatelessWidget {
   const RangoLiquidacionCard({
     super.key,
@@ -43,10 +40,8 @@ class RangoLiquidacionCard extends StatelessWidget {
     this.onFin,
   });
 
-  /// "Q4 // 2026"
   final String etiqueta;
 
-  /// Fechas ya formateadas ("01 / 10 / 2026").
   final String inicio;
   final String fin;
   final String validacion;
@@ -116,7 +111,6 @@ class RangoLiquidacionCard extends StatelessWidget {
   }
 }
 
-/// "Escaneo en Tiempo Real": sesiones realizadas, canceladas y en curso.
 class EscaneoSesiones extends StatelessWidget {
   const EscaneoSesiones({super.key, required this.realizadas, required this.canceladas, required this.enCurso});
 
@@ -217,7 +211,6 @@ class EscaneoSesiones extends StatelessWidget {
   }
 }
 
-/// "Desglose Financiero Preliminar": facturado, comisiones y valor del estudio.
 class DesgloseFinancieroCard extends StatelessWidget {
   const DesgloseFinancieroCard({
     super.key,
@@ -228,12 +221,10 @@ class DesgloseFinancieroCard extends StatelessWidget {
     required this.estudio,
   });
 
-  /// Importes ya formateados.
   final String total;
   final String comisiones;
   final String estudio;
 
-  /// "8 servicios realizados", "3 fotógrafos asignados".
   final String servicios;
   final String fotografos;
 
@@ -315,7 +306,6 @@ class DesgloseFinancieroCard extends StatelessWidget {
   }
 }
 
-/// Comisión de un fotógrafo en el cierre, con su sesión destacada opcional.
 class FotografoComisionCard extends StatelessWidget {
   const FotografoComisionCard({
     super.key,
@@ -330,14 +320,11 @@ class FotografoComisionCard extends StatelessWidget {
 
   final Fotografo fotografo;
 
-  /// "4 servicios | Tasa 30%"
   final String detalle;
   final String comision;
 
-  /// "$520.000 COP"
   final String base;
 
-  /// "Sesión Valentina Ruiz ($120.000)" y su comisión ("$36.000 COP").
   final String? sesion;
   final String? sesionComision;
   final bool destacado;

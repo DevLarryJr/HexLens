@@ -1,4 +1,3 @@
-/// Motivos para cancelar una cita: (motivo, detalle).
 const motivosCancelacion = [
   ('Solicitud directa del cliente (aviso previo > 24h)', 'Cumple ventana de reprogramación estándar sin cobro punitivo.'),
   ('Inasistencia del cliente / No-Show', 'Superó los 20 min de tolerancia de estudio.'),
@@ -7,8 +6,6 @@ const motivosCancelacion = [
   ('Otro motivo operativo', 'Registrar detalle en la bitácora de la orden.'),
 ];
 
-/// Checklist técnico para cerrar una sesión atendida: (punto, detalle).
-/// Los [checklistObligatorios] primeros son obligatorios.
 const checklistEntrega = [
   ('Toma de capturas fotográficas finalizada', 'Mínimo técnico acordado: 35 disparos RAW validados'),
   ('Selección de 5 tomas maestras', 'Revisadas y aprobadas junto al cliente en monitor de set'),

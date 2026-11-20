@@ -2,13 +2,10 @@ import '../core/reloj.dart';
 import '../models/sesion.dart';
 import 'mock_agenda.dart';
 
-/// Porcentaje de comisión del fotógrafo en sesión.
 const comisionStaffPct = 30;
 
 String _rsv(int n) => '#RSV-${Reloj.hoy.year}-0$n';
 
-/// Sesiones asignadas a la fotógrafa en sesión (rol Fotógrafo): dos de hoy (su estado depende
-/// de la hora) y una de hace una semana.
 final misServicios = [
   Sesion(
     inicio: Reloj.dia(0, 10),

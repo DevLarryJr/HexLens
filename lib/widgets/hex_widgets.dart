@@ -5,7 +5,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../theme/app_theme.dart';
 
-/// Icono exportado desde Figma (assets/icons/...).
 class SvgIcon extends StatelessWidget {
   const SvgIcon(this.path, {super.key, required this.width, double? height, this.color})
       : height = height ?? width;
@@ -14,7 +13,6 @@ class SvgIcon extends StatelessWidget {
   final double width;
   final double height;
 
-  /// Tinte opcional (p.ej. estado activo de la barra de navegación).
   final Color? color;
 
   @override
@@ -33,8 +31,6 @@ class SvgIcon extends StatelessWidget {
   }
 }
 
-/// Icono seguido de un texto (filas de metadatos: teléfono, fecha, lugar…). [ajuste] decide si
-/// el texto se adapta al ancho (loose) o lo ocupa entero (tight); sin él, mide lo que mida.
 class IconoTexto extends StatelessWidget {
   const IconoTexto(this.icono, this.texto,
       {super.key,
@@ -50,10 +46,8 @@ class IconoTexto extends StatelessWidget {
   final double separacion;
   final FlexFit? ajuste;
 
-  /// Alinea el icono con la primera línea en vez de centrarlo.
   final bool arriba;
 
-  /// Ocupa solo lo que mide su contenido en vez de todo el ancho.
   final bool compacto;
 
   @override
@@ -71,7 +65,6 @@ class IconoTexto extends StatelessWidget {
   }
 }
 
-/// Punto de color (indicadores de estado).
 class Dot extends StatelessWidget {
   const Dot({super.key, this.size = 6, this.color = AppColors.accent});
 
@@ -88,7 +81,6 @@ class Dot extends StatelessWidget {
   }
 }
 
-/// Superficie blanca con radio y sombra suave: la tarjeta base del sistema.
 class HexCard extends StatelessWidget {
   const HexCard({
     super.key,
@@ -106,7 +98,6 @@ class HexCard extends StatelessWidget {
   final double radius;
   final List<BoxShadow>? shadow;
 
-  /// Barra bermellón de 6px a la izquierda (elemento destacado / seleccionado).
   final bool accentBar;
 
   @override
@@ -136,7 +127,6 @@ class HexCard extends StatelessWidget {
   }
 }
 
-/// Etiqueta pequeña con fondo (badges de estado, chips informativos).
 class Tag extends StatelessWidget {
   const Tag({
     super.key,
@@ -176,7 +166,6 @@ class Tag extends StatelessWidget {
   }
 }
 
-/// Botón rectangular a ancho completo (variantes primario / secundario / destructivo).
 class HexButton extends StatelessWidget {
   const HexButton({
     super.key,
@@ -235,7 +224,6 @@ class HexButton extends StatelessWidget {
   }
 }
 
-/// Avatar circular negro con icono de usuario (esquina derecha del header).
 class UserAvatar extends StatelessWidget {
   const UserAvatar({super.key, required this.icon});
 
@@ -253,16 +241,12 @@ class UserAvatar extends StatelessWidget {
   }
 }
 
-/// Dato que viaja con una ruta (`RouteSettings.arguments`): nombre de la pantalla desde la que se abrió.
-/// [HexHeader] lo muestra sobre el título ("AGENDA ›"), así la única flecha de volver dice a dónde regresa.
 class VolverA {
   const VolverA(this.pantalla);
 
-  /// Ej.: "Agenda", "Inicio", "Mis Servicios".
   final String pantalla;
 }
 
-/// Header translúcido con blur fijo en la parte superior (64px).
 class HexHeader extends StatelessWidget {
   const HexHeader({
     super.key,
@@ -275,17 +259,12 @@ class HexHeader extends StatelessWidget {
 
   final double titleSize;
 
-  /// Variante "marca": HEXLENS ✦ + nombre de sección (Inicio, Agenda...).
   final String? section;
 
-  /// Variante "detalle": botón volver + logo + título.
   final String? title;
 
-  /// Por defecto vuelve a la pantalla anterior.
   final VoidCallback? onBack;
 
-  /// ✕ en vez de ←: la pantalla es una tarea (formulario, nueva reserva) que se cierra, no un lugar al que se
-  /// navega. Es su única salida sin guardar.
   final bool cerrar;
 
   @override
@@ -313,31 +292,23 @@ class HexHeader extends StatelessWidget {
     );
   }
 
+  static const double _logoWidth = 112;
+  static const double _logoHeight = 34;
+
   Widget _brand() {
     return Row(
       children: [
-        Image.asset('assets/images/logo_hexlens.png', width: 128, height: 38, fit: BoxFit.contain),
-        const SizedBox(width: 8),
+        Image.asset('assets/images/logo_hexlens.png',
+            width: _logoWidth, height: _logoHeight, fit: BoxFit.contain, alignment: Alignment.centerLeft),
+        const SizedBox(width: 12),
+        Container(width: 1, height: 24, color: AppColors.surfaceHigh),
+        const SizedBox(width: 12),
         Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text('HEXLENS',
-                      style: AppText.sans(16,
-                          weight: FontWeight.w600,
-                          color: Colors.black,
-                          lineHeight: 24,
-                          letterSpacing: -0.4)),
-                  const SizedBox(width: 6),
-                  const SvgIcon('agenda/sparkle.svg', width: 12.833),
-                ],
-              ),
-              Text(section!.toUpperCase(),
-                  style: AppText.sans(14, color: AppColors.onSurfaceVariant, lineHeight: 18)),
-            ],
+          child: Text(
+            section!,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppText.sans(18, weight: FontWeight.w600, lineHeight: 24, letterSpacing: -0.3),
           ),
         ),
         const UserAvatar(icon: 'agenda/person.svg'),
@@ -346,7 +317,6 @@ class HexHeader extends StatelessWidget {
   }
 
   Widget _detail(BuildContext context) {
-    // Pantalla de origen (si la ruta la trae): se muestra como miga sobre el título.
     final args = ModalRoute.settingsOf(context)?.arguments;
     final origen = onBack == null && !cerrar && args is VolverA ? args.pantalla : null;
     return Row(
@@ -369,8 +339,6 @@ class HexHeader extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 4),
-        Image.asset('assets/images/logo_hexlens.png', width: 128, height: 44, fit: BoxFit.contain),
         const SizedBox(width: 8),
         Expanded(
           child: Column(
@@ -382,7 +350,6 @@ class HexHeader extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: AppText.sans(12, color: AppColors.onSurfaceVariant, lineHeight: 16, letterSpacing: 0.6)),
-              // Hasta 2 líneas: el espacio junto al logo es estrecho y los títulos no deben cortarse.
               Text(
                 title!,
                 maxLines: 2,
@@ -392,15 +359,13 @@ class HexHeader extends StatelessWidget {
             ],
           ),
         ),
-        const SvgIcon('detalle/sparkle.svg', width: 14.667),
-        const SizedBox(width: 4),
+        const SizedBox(width: 8),
         const UserAvatar(icon: 'detalle/person.svg'),
       ],
     );
   }
 }
 
-/// Barra de navegación inferior (Inicio · Agenda · Clientes · Más).
 class HexBottomNav extends StatelessWidget {
   const HexBottomNav({super.key, required this.currentIndex, required this.onTap});
 
@@ -466,7 +431,6 @@ class HexBottomNav extends StatelessWidget {
   }
 }
 
-/// Layout común: contenido desplazable bajo un header fijo translúcido.
 class HeaderScaffold extends StatelessWidget {
   const HeaderScaffold({
     super.key,
@@ -507,8 +471,6 @@ class HeaderScaffold extends StatelessWidget {
   }
 }
 
-/// Barra inferior fija con fondo crema translúcido desenfocado y sombra hacia
-/// arriba (pies de reserva y reagendar). Respeta el área segura inferior.
 class BlurBottomBar extends StatelessWidget {
   const BlurBottomBar({
     super.key,
@@ -540,8 +502,6 @@ class BlurBottomBar extends StatelessWidget {
   }
 }
 
-/// Barra superior fija con fondo translúcido desenfocado, de [height] px más
-/// el área segura superior. Para pantallas con header propio (no [HexHeader]).
 class BlurTopBar extends StatelessWidget {
   const BlurTopBar({
     super.key,
@@ -553,7 +513,6 @@ class BlurTopBar extends StatelessWidget {
   final Widget child;
   final double height;
 
-  /// Solo se usan los lados izquierdo y derecho.
   final EdgeInsets padding;
 
   @override
@@ -573,7 +532,6 @@ class BlurTopBar extends StatelessWidget {
   }
 }
 
-/// Triángulo de color en una esquina superior derecha (marca de tarjeta).
 class EsquinaTriangulo extends StatelessWidget {
   const EsquinaTriangulo({super.key, required this.size, required this.color});
 
@@ -603,7 +561,6 @@ class _TrianguloPainter extends CustomPainter {
   bool shouldRepaint(_TrianguloPainter old) => old.color != color;
 }
 
-/// Asa gris centrada en la parte superior de las hojas modales.
 class SheetHandle extends StatelessWidget {
   const SheetHandle({super.key, this.width = 64});
 
@@ -619,8 +576,6 @@ class SheetHandle extends StatelessWidget {
       );
 }
 
-/// Abre [hoja] como hoja inferior transparente de alto libre sobre un velo gris
-/// ([oscuro] lo hace más opaco). Devuelve lo que la hoja pase a `Navigator.pop`.
 Future<T?> mostrarHoja<T>(BuildContext context, Widget hoja, {bool oscuro = false}) {
   return showModalBottomSheet<T>(
     context: context,
@@ -631,7 +586,6 @@ Future<T?> mostrarHoja<T>(BuildContext context, Widget hoja, {bool oscuro = fals
   );
 }
 
-/// Redibuja la pantalla cada vez que cambia [escuchar] (p. ej. el directorio de clientes).
 mixin RedibujarAlCambiar<T extends StatefulWidget> on State<T> {
   Listenable get escuchar;
 

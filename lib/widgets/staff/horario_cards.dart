@@ -1,18 +1,52 @@
 import 'package:flutter/material.dart';
 
+import '../../models/fotografo.dart';
 import '../../theme/app_theme.dart';
+import '../fotografos/foto_fotografo.dart';
 import '../hex_widgets.dart';
 
-/// Fotógrafo cuyo horario se está viendo, con botón para cambiarlo.
+Future<Fotografo?> elegirFotografoSheet(BuildContext context, List<Fotografo> opciones, Fotografo? actual) {
+  return showModalBottomSheet<Fotografo>(
+    context: context,
+    showDragHandle: true,
+    builder: (context) => SafeArea(
+      child: ListView(
+        shrinkWrap: true,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Text('Elegir fotógrafo', style: AppText.sans(16, weight: FontWeight.w700, lineHeight: 24)),
+          ),
+          for (final f in opciones)
+            ListTile(
+              leading: ClipRRect(borderRadius: AppRadius.sm, child: FotoFotografo(f, tamano: 40)),
+              title: Text(f.nombre),
+              subtitle: Text(f.activo ? f.especialidad : '${f.especialidad} • Inactivo'),
+              trailing: f.id == actual?.id ? const Icon(Icons.check) : null,
+              onTap: () => Navigator.of(context).pop(f),
+            ),
+        ],
+      ),
+    ),
+  );
+}
+
 class StaffPerfilCard extends StatelessWidget {
-  const StaffPerfilCard({super.key, required this.nombre, required this.foto, required this.detalle, this.onCambiar});
+  const StaffPerfilCard({
+    super.key,
+    required this.nombre,
+    required this.foto,
+    required this.detalle,
+    this.onCambiar,
+    this.fotografo,
+  });
 
   final String nombre;
 
-  /// Archivo dentro de `assets/images/`.
   final String foto;
 
-  /// Ej.: "Retratos • Sony A7R V".
+  final Fotografo? fotografo;
+
   final String detalle;
   final VoidCallback? onCambiar;
 
@@ -24,8 +58,10 @@ class StaffPerfilCard extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: AppRadius.md,
-            child: Image.asset('assets/images/$foto',
-                width: 56, height: 56, fit: BoxFit.cover, alignment: Alignment.topCenter),
+            child: fotografo != null
+                ? FotoFotografo(fotografo!, tamano: 56)
+                : Image.asset('assets/images/$foto',
+                    width: 56, height: 56, fit: BoxFit.cover, alignment: Alignment.topCenter),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -61,17 +97,13 @@ class StaffPerfilCard extends StatelessWidget {
   }
 }
 
-/// Carga total, jornadas y pausa diaria de la semana.
 class HorarioMetricas extends StatelessWidget {
   const HorarioMetricas({super.key, required this.carga, required this.jornadas, required this.pausa});
 
-  /// Ej.: "40h".
   final String carga;
 
-  /// Ej.: "5 Días".
   final String jornadas;
 
-  /// Ej.: "60 min".
   final String pausa;
 
   @override
@@ -123,14 +155,11 @@ class _Metrica extends StatelessWidget {
   }
 }
 
-/// Navegador de semanas: ‹ SEMANA ACTUAL · Sem 42 • Octubre 2026 ›.
 class SemanaNavegador extends StatelessWidget {
   const SemanaNavegador({super.key, required this.etiqueta, required this.titulo, this.onAnterior, this.onSiguiente});
 
-  /// Ej.: "SEMANA ACTUAL", "SEMANA +1".
   final String etiqueta;
 
-  /// Ej.: "Sem 42 • Octubre 2026".
   final String titulo;
   final VoidCallback? onAnterior;
   final VoidCallback? onSiguiente;

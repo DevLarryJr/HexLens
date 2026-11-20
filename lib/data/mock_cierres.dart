@@ -1,26 +1,25 @@
 import 'package:flutter/foundation.dart';
 
-import '../api/api.dart';
-import '../api/comisiones_api.dart';
 import '../core/reloj.dart';
 import '../models/cierre.dart';
+import '../models/common/json_utils.dart';
 import '../models/fotografo.dart';
 import '../models/liquidacion.dart';
+import '../models/liquidacion/liquidacion_request.dart';
+import '../services/local/sesion_actual.dart';
+import '../services/remote/comisiones_api.dart';
 import 'mock_agenda.dart';
 import 'mock_fotografos.dart';
 
-export '../api/comisiones_api.dart' show codigoCierre;
+export '../models/cierre.dart' show codigoCierre;
 
-/// Última quincena terminada (la del cierre más reciente) y la anterior a ella.
 final _q1 = ultimaQuincenaCerrable(Reloj.hoy);
 final _q2 = quincenaAnterior(_q1.inicio);
 
-/// Día [n] de la quincena del cierre más reciente (1 = su primer día).
 DateTime _dia(int n) => _q1.inicio.add(Duration(days: n - 1));
 
 String _rsv(int n) => '#RSV-${_q1.inicio.year}-${n.toString().padLeft(3, '0')}';
 
-/// Liquidación del cierre más reciente: sesiones realizadas de la última quincena terminada.
 final liquidacionesUltimoCierre = [
   Liquidacion(fotografoEjemplo('Laura Méndez'), [
     SesionLiquidada('Valentina Ruiz', _rsv(36), 'Retrato Profesional', _dia(15), 120000),
@@ -38,7 +37,6 @@ final liquidacionesUltimoCierre = [
   ]),
 ];
 
-/// Cierres de ejemplo (sin sesión en la API), del más reciente al más antiguo.
 final _ejemplo = [
   Cierre(
     codigo: codigoCierre(_q1.inicio),
@@ -63,18 +61,13 @@ final _ejemplo = [
   ),
 ];
 
-
-/// Cierres de período: las liquidaciones de la API si hay sesión, si no los de ejemplo (más reciente primero).
 final List<Cierre> cierres = [..._ejemplo];
 
-/// Cambia cada vez que se genera un cierre.
 final revisionCierres = ValueNotifier(0);
 
-/// Con sesión en la API, reemplaza los cierres por las liquidaciones de `GET /api/liquidaciones-comisiones`.
-/// Lanza [ApiError] si falla.
 Future<void> sincronizarCierres() async {
-  if (!Api.conectada) return;
-  final deLaApi = [for (final l in await obtenerLiquidacionesApi()) cierreDesdeApi(l)]
+  if (!SesionActual.conectada) return;
+  final deLaApi = await ComisionesApi().listarLiquidaciones()
     ..sort((a, b) => b.inicio.compareTo(a.inicio));
   cierres
     ..clear()
@@ -82,12 +75,11 @@ Future<void> sincronizarCierres() async {
   revisionCierres.value++;
 }
 
-/// Genera el cierre de [inicio] a [fin] (con sesión en la API: `POST /api/liquidaciones-comisiones`, que calcula
-/// las comisiones) y lo pone primero en la lista.
 Future<Cierre> generarCierre(DateTime inicio, DateTime fin) async {
   final Cierre nuevo;
-  if (Api.conectada) {
-    nuevo = cierreDesdeApi(await crearLiquidacionApi(inicio, fin));
+  if (SesionActual.conectada) {
+    final request = LiquidacionRequest(fechaInicio: inicio, fechaFin: fin);
+    nuevo = await ComisionesApi().crearLiquidacion(request);
   } else {
     final liquidaciones = liquidacionesEntre(inicio, fin);
     nuevo = Cierre(
@@ -107,11 +99,8 @@ Future<Cierre> generarCierre(DateTime inicio, DateTime fin) async {
   return nuevo;
 }
 
-/// Vista previa de las comisiones entre [inicio] y [fin]: con la API, las sesiones ya terminadas y no canceladas
-/// de la agenda, agrupadas por fotógrafo con su porcentaje (la API calcula el valor definitivo al generar el
-/// cierre); sin ella, las del cierre de ejemplo.
 List<Liquidacion> liquidacionesEntre(DateTime inicio, DateTime fin) {
-  if (!Api.conectada) {
+  if (!SesionActual.conectada) {
     return [
       for (final l in liquidacionesUltimoCierre)
         if (l.entre(inicio, fin).sesiones.isNotEmpty) l.entre(inicio, fin),
@@ -129,7 +118,6 @@ List<Liquidacion> liquidacionesEntre(DateTime inicio, DateTime fin) {
   return [for (final e in porFotografo.entries) Liquidacion(fotografoDe(e.key, null), e.value)];
 }
 
-/// Cuántas sesiones del rango están canceladas y cuántas siguen programadas (aún no terminan).
 ({int canceladas, int pendientes}) pendientesEntre(DateTime inicio, DateTime fin) {
   final hasta = DateTime(fin.year, fin.month, fin.day + 1);
   final ahora = Reloj.ahora();
@@ -140,16 +128,32 @@ List<Liquidacion> liquidacionesEntre(DateTime inicio, DateTime fin) {
   );
 }
 
-/// Comisiones por fotógrafo de [c]: con la API, las de `GET /api/comisiones?cierreId=`; sin ella, las de ejemplo.
 Future<List<Liquidacion>> liquidacionesDe(Cierre c) async {
-  if (Api.conectada && c.id != null) return obtenerComisionesApi(c.id!, fotografoDe: fotografoDe);
-  return liquidacionesEntre(c.inicio, c.fin);
+  if (!SesionActual.conectada || c.id == null) return liquidacionesEntre(c.inicio, c.fin);
+  final comisionesApi = ComisionesApi();
+  final comisiones = await comisionesApi.listarComisiones(c.id!);
+  return [
+    for (final comision in comisiones)
+      Liquidacion(
+        fotografoDe(
+          primerCampo(comision, ['profesional', 'profesionalNombre', 'nombreProfesional', 'profesionalId']),
+          parseApiInt(primerCampo(comision, ['porcentaje', 'tasa'])),
+        ),
+        await _serviciosDe(comision, comisionesApi),
+      ),
+  ];
 }
 
-/// Fotógrafo del staff a partir de lo que mande la API (objeto, nombre o id); si no está en el staff, uno con
-/// ese nombre y el [porcentaje] dado.
+Future<List<SesionLiquidada>> _serviciosDe(Map comision, ComisionesApi comisionesApi) async {
+  final incluidos = primerCampo(comision, ['servicios', 'reservas', 'detalle']);
+  if (incluidos is List) return [for (final s in incluidos) if (s is Map) SesionLiquidada.fromJson(Map<String, dynamic>.from(s))];
+  final id = parseApiInt(campo(comision, 'id'));
+  if (id == null) return const [];
+  return comisionesApi.listarServiciosDeComision(id);
+}
+
 Fotografo fotografoDe(Object? profesional, int? porcentaje) {
-  final id = profesional is Map ? entero(campo(profesional, 'id')) : (profesional is int ? profesional : null);
+  final id = profesional is Map ? parseApiInt(campo(profesional, 'id')) : (profesional is int ? profesional : null);
   final nombre = profesional is int ? '' : nombreDe(profesional);
   final delStaff = fotografos.where((f) => (id != null && f.id == id) || (nombre.isNotEmpty && f.nombre == nombre)).firstOrNull;
   if (delStaff != null) return delStaff;

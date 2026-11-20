@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:proyecto_movil/api/api.dart';
 import 'package:proyecto_movil/data/mock_agenda.dart';
 import 'package:proyecto_movil/data/mock_clientes.dart';
 import 'package:proyecto_movil/data/mock_especialidades.dart';
@@ -15,7 +14,7 @@ import 'api_falsa.dart';
 
 void main() {
   setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
-  tearDown(Api.cerrarSesion);
+  tearDown(SesionActual.cerrar);
 
   testWidgets('Nueva reserva de punta a punta con la API: cliente → servicio → hora → confirmar', (t) async {
     t.view.physicalSize = const Size(1600, 8000);
@@ -36,13 +35,12 @@ void main() {
       ],
       horarios: const ['10:30', '14:00'],
     );
-    await Api.iniciarSesion(usuarioPrueba, clavePrueba);
+    await iniciarSesion(usuarioPrueba, clavePrueba);
     await sincronizarClientes();
     await sincronizarEspecialidades();
     await sincronizarServicios();
     await sincronizarAgenda();
 
-    // La fuente de pruebas (Ahem) es más ancha que Noto Sans; este test solo mira lógica.
     await t.pumpWidget(MaterialApp(
       theme: buildAppTheme(),
       builder: (context, child) => MediaQuery(
@@ -56,18 +54,15 @@ void main() {
     await t.tap(find.text('Nueva'));
     await t.pumpAndSettle();
 
-    // Paso 1: el cliente de la API viene elegido.
     expect(find.text('Larry Sánchez'), findsOneWidget);
     await t.tap(find.text('Continuar a Servicio y Fotógrafo'));
     await t.pumpAndSettle();
 
-    // Paso 2: el servicio de la API, y el resumen muestra al cliente elegido.
     expect(find.textContaining('Larry Sánchez', findRichText: true), findsOneWidget);
     expect(find.text('Sesión de retrato'), findsOneWidget);
     await t.tap(find.text('Continuar'));
     await t.pumpAndSettle();
 
-    // Paso 3: los horarios salen de GET /api/agenda, y el fotógrafo de los profesionales de la especialidad.
     final agenda = peticionesRecibidas.lastWhere((p) => p.url.path == '/api/agenda');
     expect(agenda.url.queryParameters['servicioId'], '7');
     expect(agenda.url.queryParameters['profesionalId'], '17');
@@ -76,7 +71,6 @@ void main() {
     await t.tap(find.text('Continuar a Confirmación'));
     await t.pumpAndSettle();
 
-    // Paso 4: confirmar crea la reserva en la API y vuelve a la agenda.
     expect(find.textContaining('Larry Sánchez', findRichText: true), findsWidgets);
     expect(find.text('Ana López'), findsOneWidget);
     await t.tap(find.text('Confirmar reserva'));

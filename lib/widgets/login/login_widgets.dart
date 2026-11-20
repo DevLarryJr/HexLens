@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// "SYS.ONLINE" y "APERTURE // 01".
 class LoginTopIndicator extends StatelessWidget {
   const LoginTopIndicator({super.key});
 
@@ -30,7 +29,6 @@ class LoginTopIndicator extends StatelessWidget {
   }
 }
 
-/// "SISTEMA ADMINISTRATIVO OPERATIVO" con el destello girado.
 class LoginEncabezado extends StatelessWidget {
   const LoginEncabezado({super.key});
 
@@ -41,7 +39,6 @@ class LoginEncabezado extends StatelessWidget {
       children: [
         Column(
           children: [
-            // Espacio reservado del logo central (72px en el diseño).
             const SizedBox(height: 72),
             SizedBox(
               width: double.infinity,
@@ -76,7 +73,6 @@ class LoginEncabezado extends StatelessWidget {
   }
 }
 
-/// Selector de rol Admin / Fotógrafo.
 class RolSelector extends StatelessWidget {
   const RolSelector({super.key, required this.isAdmin, required this.onChanged});
 
@@ -131,7 +127,6 @@ class RolSelector extends StatelessWidget {
   }
 }
 
-/// Campo de 48 px del login; con [error], borde rojo.
 class LoginCampo extends StatelessWidget {
   const LoginCampo({
     super.key,
@@ -188,7 +183,6 @@ class LoginCampo extends StatelessWidget {
   }
 }
 
-/// Casilla "Mantener sesión activa" y sello "SSL 256".
 class RecordarSesionRow extends StatelessWidget {
   const RecordarSesionRow({super.key, required this.recordar, required this.onToggle});
 
@@ -225,7 +219,6 @@ class RecordarSesionRow extends StatelessWidget {
   }
 }
 
-/// "Estado de Estudio Hoy": sesiones activas y set en uso.
 class EstadoEstudioCard extends StatelessWidget {
   const EstadoEstudioCard({super.key, required this.sesiones, required this.set, required this.horario});
 
@@ -264,7 +257,6 @@ class EstadoEstudioCard extends StatelessWidget {
   }
 }
 
-/// Versión y lema al pie del login.
 class LoginFooter extends StatelessWidget {
   const LoginFooter({super.key});
 

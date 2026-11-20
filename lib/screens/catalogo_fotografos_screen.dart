@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../api/api.dart';
 import '../core/reloj.dart';
 import '../data/estado_staff.dart';
 import '../data/mock_especialidades.dart';
 import '../data/mock_fotografos.dart';
 import '../data/mock_inasistencias.dart';
 import '../models/fotografo.dart';
+import '../services/local/sesion_actual.dart';
+import '../services/remote/api_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/formato.dart';
 import '../widgets/fotografos/fotografo_card.dart';
@@ -16,7 +17,6 @@ import '../widgets/hex_search_field.dart';
 import '../widgets/hex_widgets.dart';
 import 'actualizar_condiciones_screen.dart';
 
-/// Figma: "HexLens - Catálogo de Fotógrafos" (19:2985)
 class CatalogoFotografosScreen extends StatefulWidget {
   const CatalogoFotografosScreen({
     super.key,
@@ -43,10 +43,8 @@ class _CatalogoFotografosScreenState extends State<CatalogoFotografosScreen> wit
 
   int _filtro = 0;
 
-  /// Consultando la API al abrir.
   bool _cargando = false;
 
-  /// Error al consultar la API; null si no hubo.
   String? _error;
 
   @override
@@ -55,9 +53,8 @@ class _CatalogoFotografosScreenState extends State<CatalogoFotografosScreen> wit
     _recargar();
   }
 
-  /// Trae especialidades y profesionales de la API (las especialidades dan el nombre de la de cada uno).
   Future<void> _recargar() async {
-    if (!Api.conectada) return;
+    if (!SesionActual.conectada) return;
     setState(() {
       _cargando = true;
       _error = null;
@@ -65,14 +62,13 @@ class _CatalogoFotografosScreenState extends State<CatalogoFotografosScreen> wit
     try {
       await sincronizarEspecialidades();
       await sincronizarFotografos();
-    } on ApiError catch (e) {
-      _error = e.mensaje;
+    } on ApiException catch (e) {
+      _error = e.message;
     } finally {
       if (mounted) setState(() => _cargando = false);
     }
   }
 
-  /// "Todos" + las especialidades del staff, en orden de aparición.
   List<String> get _filtros => [
         'Todos',
         ...{for (final f in fotografos) f.especialidad},
@@ -82,16 +78,14 @@ class _CatalogoFotografosScreenState extends State<CatalogoFotografosScreen> wit
     try {
       await cambiarEstadoFotografo(f, activo: true);
       if (mounted) showHexToast(context, '${f.nombre} reactivado');
-    } on ApiError catch (e) {
-      if (mounted) showHexToast(context, e.mensaje);
+    } on ApiException catch (e) {
+      if (mounted) showHexToast(context, e.message);
     }
   }
 
-  /// Por qué está inactivo: una ausencia vigente hoy (licencia, permiso…) o su estado en el staff.
   String _motivoInactivo(Fotografo f) =>
       inasistencias.any((i) => i.fotografo == f.nombre && i.cubre(Reloj.hoy)) ? 'LICENCIA TEMPORAL' : 'INACTIVO';
 
-  /// "Ver Ficha" / "Editar": abre las condiciones de ese fotógrafo.
   void _verFicha(Fotografo f) =>
       Navigator.of(context).push(MaterialPageRoute(builder: (_) => ActualizarCondicionesScreen(fotografo: f)));
 

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Selector de vista de la agenda: Semanas / Día / Mensual.
 class VistaTabs extends StatelessWidget {
   const VistaTabs({super.key, required this.seleccion, this.onSelect});
 

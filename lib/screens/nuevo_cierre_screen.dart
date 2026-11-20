@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 
-import '../api/api.dart';
 import '../core/reloj.dart';
 import '../data/mock_cierres.dart';
 import '../models/cierre.dart';
 import '../models/liquidacion.dart';
+import '../services/remote/api_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/formato.dart';
 import '../widgets/cierres/nuevo_cierre_widgets.dart';
 import '../widgets/hex_form.dart';
 import '../widgets/hex_widgets.dart';
 
-/// Figma: "HexLens - Nuevo Cierre Contable" (19:5310)
 class NuevoCierreScreen extends StatefulWidget {
   const NuevoCierreScreen({super.key, this.onConfirmar});
 
@@ -25,7 +24,6 @@ class _NuevoCierreScreenState extends State<NuevoCierreScreen> with ProtegeCambi
   @override
   String get firmaFormulario => '$_inicio|$_fin';
 
-  /// Por defecto, la última quincena ya terminada.
   DateTime _inicio = ultimaQuincenaCerrable(Reloj.hoy).inicio;
   DateTime _fin = ultimaQuincenaCerrable(Reloj.hoy).fin;
 
@@ -44,10 +42,8 @@ class _NuevoCierreScreenState extends State<NuevoCierreScreen> with ProtegeCambi
 
   String _plural(int n, String uno, String varios) => '$n ${n == 1 ? uno : varios}';
 
-  /// Enviando a la API.
   bool _guardando = false;
 
-  /// Genera el cierre del rango (con la API: `POST /api/liquidaciones-comisiones`). No repite un rango ya cerrado.
   Future<void> _confirmar() async {
     final repetido = cierres.where((c) => mismoDia(c.inicio, _inicio) && mismoDia(c.fin, _fin)).firstOrNull;
     if (repetido != null) {
@@ -61,8 +57,8 @@ class _NuevoCierreScreenState extends State<NuevoCierreScreen> with ProtegeCambi
       showHexToast(context, 'Cierre ${cierre.codigo} generado');
       widget.onConfirmar?.call();
       salirSinPreguntar();
-    } on ApiError catch (e) {
-      if (mounted) showHexToast(context, e.mensaje);
+    } on ApiException catch (e) {
+      if (mounted) showHexToast(context, e.message);
     } finally {
       if (mounted) setState(() => _guardando = false);
     }
@@ -119,7 +115,6 @@ class _NuevoCierreScreenState extends State<NuevoCierreScreen> with ProtegeCambi
             detalle: '${_plural(l.sesiones.length, 'servicio', 'servicios')} | Tasa ${l.tasa}%',
             comision: formatCop(l.comision),
             base: '${formatCop(l.base)} COP',
-            // El primero muestra su sesión más reciente.
             sesion: i == 0 ? 'Sesión ${l.sesiones.first.cliente} (${formatCop(l.sesiones.first.tarifa)})' : null,
             sesionComision: i == 0 ? '${formatCop(l.comisionDe(l.sesiones.first.tarifa))} COP' : null,
             destacado: i == 0,

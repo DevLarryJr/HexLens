@@ -3,18 +3,13 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Tarjeta negra "Cierre Operativo Proyectado" con el total confirmado y las
-/// horas en set del día.
 class CierreResumenCard extends StatelessWidget {
   const CierreResumenCard({super.key, required this.fecha, required this.total, required this.horas});
 
-  /// Ej.: "15 OCT".
   final String fecha;
 
-  /// Ej.: "$700.000".
   final String total;
 
-  /// Ej.: "4.25 h".
   final String horas;
 
   @override

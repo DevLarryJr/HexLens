@@ -4,7 +4,6 @@ import '../../theme/app_theme.dart';
 import '../hex_form.dart';
 import '../hex_widgets.dart';
 
-/// Franja "ERR_STATE // VALIDATION_FAIL" u "OK_STATE // VALIDATION_PASS".
 class ValidacionEstadoBar extends StatelessWidget {
   const ValidacionEstadoBar({super.key, required this.errores});
 
@@ -34,7 +33,6 @@ class ValidacionEstadoBar extends StatelessWidget {
   }
 }
 
-/// Aviso "Error al guardar" con el número de campos señalados.
 class ErrorGuardarBanner extends StatelessWidget {
   const ErrorGuardarBanner({super.key, required this.errores});
 
@@ -83,11 +81,9 @@ class ErrorGuardarBanner extends StatelessWidget {
   }
 }
 
-/// "Documento de Identidad (C.C. / NIT)" verificado, solo lectura.
 class DocumentoVerificadoCard extends StatelessWidget {
   const DocumentoVerificadoCard({super.key, required this.documento});
 
-  /// Solo el número: "1.020.345.981".
   final String documento;
 
   @override
@@ -120,11 +116,9 @@ class DocumentoVerificadoCard extends StatelessWidget {
   }
 }
 
-/// "Canal de Pago / Transferencia" bloqueado.
 class CanalPagoCard extends StatelessWidget {
   const CanalPagoCard({super.key, required this.cuenta});
 
-  /// "Bancolombia Ahorros - 459-002-129"
   final String cuenta;
 
   @override
@@ -153,7 +147,6 @@ class CanalPagoCard extends StatelessWidget {
   }
 }
 
-/// "Auditoría Criptográfica" con el hash de integridad.
 class AuditoriaCard extends StatelessWidget {
   const AuditoriaCard({super.key, required this.hash});
 
@@ -193,7 +186,6 @@ class AuditoriaCard extends StatelessWidget {
   }
 }
 
-/// Insignia roja "N errores" junto al botón de guardar.
 class ErroresInsignia extends StatelessWidget {
   const ErroresInsignia({super.key, required this.errores});
 

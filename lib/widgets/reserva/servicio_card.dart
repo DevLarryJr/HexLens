@@ -5,7 +5,6 @@ import '../../theme/app_theme.dart';
 import '../../utils/formato.dart';
 import '../hex_widgets.dart';
 
-/// Círculo de selección: negro con check si está seleccionado, gris si no.
 class SelectCheck extends StatelessWidget {
   const SelectCheck({super.key, required this.selected, this.size = 24});
 
@@ -27,8 +26,6 @@ class SelectCheck extends StatelessWidget {
   }
 }
 
-/// Tarjeta de servicio del paso 2 de la reserva. Seleccionada muestra la barra
-/// de acento, las fotos de muestra y el precio destacado.
 class ServicioCard extends StatelessWidget {
   const ServicioCard({super.key, required this.servicio, required this.selected, this.onTap});
 

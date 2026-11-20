@@ -4,9 +4,6 @@ import 'package:flutter/services.dart';
 import '../theme/app_theme.dart';
 import 'hex_widgets.dart';
 
-/// Etiqueta de campo con marcador opcional "* Requerido".
-/// Etiqueta de un campo de formulario (la única de la app): texto, asterisco rojo si es
-/// obligatorio, todo en rojo si el campo tiene error y un detalle opcional a la derecha.
 class FieldLabel extends StatelessWidget {
   const FieldLabel(this.text, {super.key, this.required = false, this.error = false, this.trailing});
 
@@ -14,7 +11,6 @@ class FieldLabel extends StatelessWidget {
   final bool required;
   final bool error;
 
-  /// Detalle a la derecha: contador, etiqueta, "(Opcional)"…
   final Widget? trailing;
 
   @override
@@ -42,8 +38,6 @@ class FieldLabel extends StatelessWidget {
 
 enum TipoMensaje { ayuda, error, ok }
 
-/// Mensaje bajo un campo o una validación (el único de la app): ayuda en gris, error en rojo
-/// u ok en verde, con su ícono. Con [visible] en falso no ocupa espacio.
 class MensajeCampo extends StatelessWidget {
   const MensajeCampo(this.texto, {super.key, this.tipo = TipoMensaje.ayuda, this.visible = true, this.margenSuperior = 6});
 
@@ -74,7 +68,6 @@ class MensajeCampo extends StatelessWidget {
   }
 }
 
-/// Campo de texto del sistema HexLens (fondo blanco, radio 2, sin borde).
 class HexTextField extends StatelessWidget {
   const HexTextField({
     super.key,
@@ -106,7 +99,6 @@ class HexTextField extends StatelessWidget {
   final bool mono;
   final ValueChanged<String>? onChanged;
 
-  /// Formato mientras se escribe (p. ej. `formatoDocumento`, `formatoTelefono`).
   final List<TextInputFormatter>? formatos;
 
   @override
@@ -158,7 +150,6 @@ class HexTextField extends StatelessWidget {
   }
 }
 
-/// Selector desplegable con el estilo de los campos.
 class HexDropdown extends StatelessWidget {
   const HexDropdown({super.key, required this.value, required this.items, required this.onChanged});
 
@@ -177,7 +168,6 @@ class HexDropdown extends StatelessWidget {
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          // Si el valor no está en la lista (p. ej. la lista llegó de la API), no se marca ninguno.
           value: items.contains(value) ? value : null,
           hint: Text(items.isEmpty ? 'No hay opciones' : 'Elige una opción',
               style: AppText.sans(16, color: AppColors.outline)),
@@ -193,7 +183,6 @@ class HexDropdown extends StatelessWidget {
   }
 }
 
-/// Selector segmentado (fondo crema, opción activa negra).
 class HexSegmented extends StatelessWidget {
   const HexSegmented({
     super.key,
@@ -261,7 +250,6 @@ class HexSegmented extends StatelessWidget {
   }
 }
 
-/// Interruptor negro con etiqueta y descripción.
 class HexSwitchRow extends StatelessWidget {
   const HexSwitchRow({
     super.key,
@@ -303,7 +291,6 @@ class HexSwitchRow extends StatelessWidget {
   }
 }
 
-/// Caja de nota/estado (fondo crema claro con icono).
 class InfoBox extends StatelessWidget {
   const InfoBox({
     super.key,
@@ -318,7 +305,6 @@ class InfoBox extends StatelessWidget {
   final Widget child;
   final IconData? icon;
 
-  /// Icono personalizado (p.ej. SVG de Figma); tiene prioridad sobre [icon].
   final Widget? leading;
   final Color iconColor;
   final Color background;
@@ -346,7 +332,6 @@ class InfoBox extends StatelessWidget {
   }
 }
 
-/// Tarjeta blanca de un campo de formulario, con margen inferior de 24.
 class TarjetaCampo extends StatelessWidget {
   const TarjetaCampo({super.key, required this.child});
 
@@ -359,7 +344,6 @@ class TarjetaCampo extends StatelessWidget {
       );
 }
 
-/// Cabecera de sección "MÓDULO // ..." con punto bermellón y versión a la derecha.
 class ModuleHeader extends StatelessWidget {
   const ModuleHeader({
     super.key,
@@ -414,7 +398,6 @@ class _RedDot extends StatelessWidget {
       );
 }
 
-/// Encabezado de pantalla tipo modal: botón cerrar, título, etiqueta y subtítulo.
 class ModalHeader extends StatelessWidget implements PreferredSizeWidget {
   const ModalHeader({super.key, required this.title, required this.subtitle, this.tag});
 
@@ -480,9 +463,6 @@ class ModalHeader extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-/// Encabezado de sección (el único de la app): marca opcional, título y a la derecha un
-/// [dato] de texto o un widget [extra]. [subrayado] añade la línea inferior y [franja] lo
-/// pone sobre fondo gris.
 class EncabezadoSeccion extends StatelessWidget {
   const EncabezadoSeccion(
     this.titulo, {
@@ -531,7 +511,6 @@ class EncabezadoSeccion extends StatelessWidget {
   }
 }
 
-/// Marca cuadrada bermellón de 8 px para [EncabezadoSeccion].
 class MarcaSeccion extends StatelessWidget {
   const MarcaSeccion({super.key});
 
@@ -539,7 +518,6 @@ class MarcaSeccion extends StatelessWidget {
   Widget build(BuildContext context) => Container(width: 8, height: 8, color: AppColors.accentBright);
 }
 
-/// Muestra un aviso negro flotante (estilo toast HexLens).
 void showHexToast(BuildContext context, String message) {
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
@@ -550,7 +528,6 @@ void showHexToast(BuildContext context, String message) {
     ));
 }
 
-/// Pregunta antes de perder lo que se llenó. Devuelve true si el usuario elige salir.
 Future<bool> confirmarSalida(
   BuildContext context, {
   String titulo = '¿Descartar los cambios?',
@@ -575,25 +552,15 @@ Future<bool> confirmarSalida(
   return salirOk == true;
 }
 
-/// Formulario de pantalla completa con una sola salida: la ✕ del header (o el atrás del sistema). Si hay
-/// cambios sin guardar, pregunta antes de descartarlos ([confirmarSalida]).
-///
-/// La pantalla define [firmaFormulario] con sus valores editables, envuelve su contenido con [protegerSalida]
-/// y, después de guardar, sale con [salirSinPreguntar].
 mixin ProtegeCambios<T extends StatefulWidget> on State<T> {
-  /// Valores editables unidos en un texto, p. ej. `'${_nombre.text}|$_duracion'`. Si difieren de los del
-  /// primer dibujo, hay cambios sin guardar.
   String get firmaFormulario;
 
   String? _firmaInicial;
 
-  /// Algo es distinto a como se abrió la pantalla.
   bool get hayCambios => _firmaInicial != null && firmaFormulario != _firmaInicial;
 
-  /// Toma los valores actuales como punto de partida (p. ej., al cargar otra semana).
   void reiniciarFirma() => _firmaInicial = firmaFormulario;
 
-  /// Envuelve la pantalla: salir (✕ o atrás del sistema) con cambios pregunta antes.
   Widget protegerSalida(Widget child) {
     _firmaInicial ??= firmaFormulario;
     return PopScope(
@@ -607,17 +574,12 @@ mixin ProtegeCambios<T extends StatefulWidget> on State<T> {
     );
   }
 
-  /// Cierra la pantalla sin preguntar (después de guardar o eliminar).
   void salirSinPreguntar() {
     final navegador = Navigator.of(context);
     if (navegador.canPop()) navegador.pop();
   }
 }
 
-/// Par de botones que cierra un formulario u hoja (el único de la app): secundario gris a la
-/// izquierda y principal (negro por defecto) ocupando 3/5 del ancho. Sin [onPrincipal] el
-/// principal se ve deshabilitado. Sin [secundario] el principal ocupa todo el ancho (en las
-/// pantallas, salir sin guardar es la ✕ del header: no hace falta un "Descartar" abajo).
 class ParAcciones extends StatelessWidget {
   const ParAcciones({
     super.key,
@@ -639,7 +601,6 @@ class ParAcciones extends StatelessWidget {
   final Widget? iconoPrincipal;
   final Color colorPrincipal;
 
-  /// Marca junto al texto principal, p. ej. "2 errores".
   final Widget? insignia;
 
   @override
@@ -722,7 +683,6 @@ class _Boton extends StatelessWidget {
   }
 }
 
-/// Barra inferior fija (fondo crema translúcido) para un [ParAcciones].
 class BarraAcciones extends StatelessWidget {
   const BarraAcciones({super.key, required this.child});
 

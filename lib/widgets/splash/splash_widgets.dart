@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Marco de visor de cámara: esquinas, exposición, mira central y "REC".
 class SplashVisor extends StatelessWidget {
   const SplashVisor({super.key});
 
@@ -57,7 +56,6 @@ class SplashVisor extends StatelessWidget {
   }
 }
 
-/// "SYS.ONLINE" y la sede "BOG-STD01".
 class SplashTelemetria extends StatelessWidget {
   const SplashTelemetria({super.key});
 
@@ -80,7 +78,6 @@ class SplashTelemetria extends StatelessWidget {
   }
 }
 
-/// Logo en marcos concéntricos, nombre del estudio y versión del motor.
 class SplashMarca extends StatelessWidget {
   const SplashMarca({super.key});
 
@@ -153,11 +150,9 @@ class SplashMarca extends StatelessWidget {
   }
 }
 
-/// Tarjeta de carga con porcentaje, barra y estado de los servicios.
 class SplashCarga extends StatelessWidget {
   const SplashCarga({super.key, required this.progreso});
 
-  /// 0–1.
   final double progreso;
 
   @override
@@ -220,7 +215,6 @@ class SplashCarga extends StatelessWidget {
   }
 }
 
-/// Créditos y edición al pie del splash.
 class SplashPie extends StatelessWidget {
   const SplashPie({super.key});
 

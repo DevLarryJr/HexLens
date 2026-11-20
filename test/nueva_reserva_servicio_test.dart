@@ -11,8 +11,6 @@ void main() {
     t.view.physicalSize = const Size(1600, 6000);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
-    // La fuente de pruebas (Ahem) es más ancha que Noto Sans; se reduce para
-    // que los botones de ancho fijo no desborden. Este test solo mira lógica.
     await t.pumpWidget(MaterialApp(
       theme: buildAppTheme(),
       builder: (context, child) => MediaQuery(

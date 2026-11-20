@@ -4,13 +4,11 @@ import '../../models/fotografo.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formato.dart';
 
-/// Foto del fotógrafo, o sus iniciales sobre fondo oscuro si no tiene (los registrados en la API).
 class FotoFotografo extends StatelessWidget {
   const FotoFotografo(this.fotografo, {super.key, this.tamano});
 
   final Fotografo fotografo;
 
-  /// Lado del cuadro; sin él ocupa el espacio que le den.
   final double? tamano;
 
   @override

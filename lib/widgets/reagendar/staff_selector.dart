@@ -4,7 +4,6 @@ import '../../models/opcion_staff.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Fotógrafo asignado actualmente y lista de operadores para reasignar.
 class StaffSelector extends StatelessWidget {
   const StaffSelector({
     super.key,
@@ -17,7 +16,6 @@ class StaffSelector extends StatelessWidget {
 
   final String titular;
 
-  /// Ej.: "Especialista en Retrato\nEditorial".
   final String especialidad;
   final List<OpcionStaff> opciones;
   final int seleccion;

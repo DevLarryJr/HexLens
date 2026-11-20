@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Contenedor común de las hojas de confirmación: asa, encabezado, cuerpo desplazable y barra de acciones
-/// fija abajo. Sin botón cerrar: la salida es el botón secundario de [actions] (o deslizar la hoja hacia abajo).
 class ConfirmacionSheetFrame extends StatelessWidget {
   const ConfirmacionSheetFrame({
     super.key,
@@ -18,7 +16,6 @@ class ConfirmacionSheetFrame extends StatelessWidget {
   final List<Widget> body;
   final Widget actions;
 
-  /// Borde superior rosado (acciones destructivas).
   final bool accentTop;
 
   @override
@@ -62,14 +59,12 @@ class ConfirmacionSheetFrame extends StatelessWidget {
   }
 }
 
-/// Fila "📷 #ORD-9821 · ● ESTADO" de las hojas de confirmación.
 class OrdenHeader extends StatelessWidget {
   const OrdenHeader({super.key, required this.codigo, required this.estado, required this.dark});
 
   final String codigo;
   final String estado;
 
-  /// Etiqueta de estado negra (programada) o gris (en curso).
   final bool dark;
 
   @override

@@ -19,7 +19,6 @@ void main() {
     t.view.physicalSize = const Size(1600, 8000);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
-    // La fuente de pruebas (Ahem) es más ancha que Noto Sans; este test solo mira lógica.
     await t.pumpWidget(MaterialApp(
       theme: buildAppTheme(),
       builder: (context, child) => MediaQuery(
@@ -49,7 +48,7 @@ void main() {
     expect(find.text('Especialidad:\nFamiliar'), findsOneWidget);
     expect(find.text('MR'), findsOneWidget);
     expect(find.text('Comisión\n35%'), findsOneWidget);
-    expect(find.text('\$63.000 COP'), findsOneWidget); // 35 % de $180.000
+    expect(find.text('\$63.000 COP'), findsOneWidget);
   });
 
   testWidgets('Detalle: una sola salida, y el header dice a dónde vuelve', (t) async {
@@ -65,7 +64,6 @@ void main() {
     await t.tap(find.text('abrir'));
     await t.pumpAndSettle();
 
-    // Ya no existe el "Volver a Agenda" duplicado (que además mentía si venías de Inicio).
     expect(find.text('Volver a Agenda'), findsNothing);
     expect(find.text('INICIO ›'), findsOneWidget);
     expect(find.bySemanticsLabel('Volver a Inicio'), findsOneWidget);

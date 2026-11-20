@@ -5,7 +5,6 @@ import '../../utils/formato.dart';
 import '../hex_form.dart';
 import '../hex_widgets.dart';
 
-/// Etiquetas "HEX-STAFF // ALTA OPERATIVA", "REG-01 • AUDITORÍA RRHH", título y subtítulo.
 class RegistroStaffEncabezado extends StatelessWidget {
   const RegistroStaffEncabezado({super.key});
 
@@ -46,7 +45,6 @@ class RegistroStaffEncabezado extends StatelessWidget {
   }
 }
 
-/// Pastilla monoespaciada ("REQUERIDO *" en rojo, estados con punto).
 class FichaPill extends StatelessWidget {
   const FichaPill(this.texto, {super.key, this.rojo = false, this.punto = false});
 
@@ -68,15 +66,12 @@ class FichaPill extends StatelessWidget {
       );
 }
 
-/// Porcentaje de comisión con deslizador y simulación sobre una sesión.
 class ComisionSimuladorCard extends StatelessWidget {
   const ComisionSimuladorCard({super.key, required this.valor, required this.onChanged, required this.precioSesion});
 
-  /// 0–100, en pasos de 5.
   final double valor;
   final ValueChanged<double> onChanged;
 
-  /// Tarifa de la sesión de ejemplo, en COP.
   final int precioSesion;
 
   @override
@@ -148,7 +143,6 @@ class ComisionSimuladorCard extends StatelessWidget {
       );
 }
 
-/// Selector Activo / En Licencia / Inactivo con su explicación.
 class EstadoOperativoSelector extends StatelessWidget {
   const EstadoOperativoSelector({super.key, required this.selected, required this.onSelect});
 
@@ -211,7 +205,6 @@ class EstadoOperativoSelector extends StatelessWidget {
   }
 }
 
-/// "NOTA DE CUMPLIMIENTO" sobre la tasa de comisión.
 class NotaCumplimiento extends StatelessWidget {
   const NotaCumplimiento({super.key});
 

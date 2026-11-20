@@ -10,21 +10,17 @@ import '../widgets/hex_chips.dart';
 import '../widgets/hex_form.dart';
 import '../widgets/hex_widgets.dart';
 import '../widgets/reserva/fotografo_opcion_cards.dart';
-import '../widgets/reserva/resumen_footer.dart';
 import '../widgets/reserva/reserva_stepper.dart';
+import '../widgets/reserva/resumen_footer.dart';
 import '../widgets/reserva/servicio_card.dart';
 
-/// Figma: "HexLens - Nueva Reserva: Servicio y Fotógrafo" (19:1265)
 class NuevaReservaServicioScreen extends StatefulWidget {
   const NuevaReservaServicioScreen({super.key, this.onContinuar, this.onSalir, this.cliente});
 
-  /// Sigue al paso 3 con el servicio elegido.
   final ValueChanged<Servicio>? onContinuar;
 
-  /// ✕ del header: sale de toda la reserva. "Volver" (abajo) regresa al paso anterior.
   final VoidCallback? onSalir;
 
-  /// Cliente elegido en el paso 1 (por defecto, el de ejemplo).
   final Cliente? cliente;
 
   @override
@@ -32,15 +28,12 @@ class NuevaReservaServicioScreen extends StatefulWidget {
 }
 
 class _NuevaReservaServicioScreenState extends State<NuevaReservaServicioScreen> {
-  /// "Todas" y las especialidades que tienen servicios (de la API si hay sesión).
   final List<String> _categorias = ['Todas', ...{for (final s in serviciosReserva) s.categoria}];
 
-  /// Arranca en la primera especialidad (Retratos en los datos de ejemplo).
   late int _categoria = _categorias.length > 1 ? 1 : 0;
 
-  /// Servicio elegido; null si el estudio aún no tiene servicios.
   Servicio? _servicio = serviciosReserva.firstOrNull;
-  int _fotografo = 1; // 0 = cualquiera disponible, 1 = Laura
+  int _fotografo = 1;
 
   static const _titulos = {
     'Retratos': 'Servicios de Retrato',
@@ -68,7 +61,6 @@ class _NuevaReservaServicioScreenState extends State<NuevaReservaServicioScreen>
           duracion: _servicio?.duracion ?? '—',
           asignacion: _fotografo == 1 ? 'Fotógrafa disponible' : 'Auto-asignación',
           onBack: back,
-          // Sin servicio elegido no se puede seguir.
           onContinuar: _servicio == null || widget.onContinuar == null ? null : () => widget.onContinuar!(_servicio!),
         ),
       ),

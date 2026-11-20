@@ -3,14 +3,12 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Pestañas "Jornada y Horarios" / "Inasistencias" compartidas por las pantallas de staff.
 class StaffTabs extends StatelessWidget {
   const StaffTabs({super.key, required this.current, required this.onTap, this.inasistencias = 1});
 
   final int current;
   final ValueChanged<int> onTap;
 
-  /// Número en el globo rojo de "Inasistencias". Con 0 no se muestra.
   final int inasistencias;
 
   @override
@@ -30,7 +28,6 @@ class StaffTabs extends StatelessWidget {
           ),
           _Tab(
             selected: current == 1,
-            // En Figma, "Inasistencias" activa se muestra como píldora negra.
             dark: current == 1,
             onTap: () => onTap(1),
             icon: 'horario/tab_inasistencias.svg',

@@ -4,7 +4,6 @@ import '../../models/especialidad.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Aviso "Sincronización técnica exitosa" que se puede cerrar.
 class SincronizacionBanner extends StatelessWidget {
   const SincronizacionBanner({super.key, required this.mensaje, this.onCerrar});
 
@@ -56,7 +55,6 @@ class SincronizacionBanner extends StatelessWidget {
   }
 }
 
-/// Título "Catálogo de Especialidades" con el botón "Nueva".
 class EspecialidadesTitulo extends StatelessWidget {
   const EspecialidadesTitulo({super.key, this.onNueva});
 
@@ -112,7 +110,6 @@ class _IconoEspecialidad extends StatelessWidget {
   }
 }
 
-/// Tarjeta de una especialidad: servicios, titular y acciones (editar el nombre y eliminar).
 class EspecialidadCard extends StatelessWidget {
   const EspecialidadCard({
     super.key,
@@ -127,14 +124,11 @@ class EspecialidadCard extends StatelessWidget {
 
   final Especialidad especialidad;
 
-  /// Nombres de sus servicios.
   final List<String> servicios;
 
-  /// Nombre del titular ("Sin asignar" si no hay) y sus iniciales ("--").
   final String titular;
   final String iniciales;
 
-  /// Punto rojo y destello junto al nombre.
   final bool destacada;
   final VoidCallback? onEditar;
   final VoidCallback? onEliminar;

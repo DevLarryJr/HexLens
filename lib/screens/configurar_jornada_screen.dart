@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../data/mock_agenda.dart';
 import '../core/reloj.dart';
+import '../data/mock_agenda.dart';
 import '../data/mock_fotografos.dart';
 import '../data/mock_horario.dart';
+import '../models/fotografo.dart';
 import '../models/jornada.dart';
 import '../models/sesion.dart';
+import '../services/remote/api_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/formato.dart';
 import '../widgets/calendario_mensual.dart';
@@ -13,7 +15,6 @@ import '../widgets/hex_form.dart';
 import '../widgets/hex_widgets.dart';
 import '../widgets/jornada/jornada_cards.dart';
 
-/// Figma: "HexLens - Configurar Jornada y Almuerzo" (19:4377)
 class ConfigurarJornadaScreen extends StatefulWidget {
   const ConfigurarJornadaScreen({super.key});
 
@@ -21,12 +22,13 @@ class ConfigurarJornadaScreen extends StatefulWidget {
   State<ConfigurarJornadaScreen> createState() => _ConfigurarJornadaScreenState();
 }
 
-/// Jornada editable de un día (minutos desde la medianoche).
 class _Edicion {
   _Edicion.desde(Jornada j)
       : inicio = j.inicioMin ?? 8 * 60,
         fin = j.finMin ?? 17 * 60,
-        almuerzo = j.libre || j.almuerzo;
+        almuerzo = j.libre || j.almuerzo,
+        almInicio = j.almuerzoInicioMin ?? almuerzoInicioMin,
+        almFin = j.almuerzoFinMin ?? almuerzoInicioMin + Jornada.pausaAlmuerzoMin;
 
   _Edicion.copia(_Edicion o)
       : inicio = o.inicio,
@@ -38,45 +40,78 @@ class _Edicion {
   int inicio;
   int fin;
   bool almuerzo;
-  int almInicio = almuerzoInicioMin;
-  int almFin = almuerzoInicioMin + Jornada.pausaAlmuerzoMin;
+  int almInicio;
+  int almFin;
+
+  String get firma => '$inicio-$fin-$almuerzo-$almInicio-$almFin';
+
+  Jornada jornada(DateTime fecha) => Jornada(
+        fecha: fecha,
+        inicioMin: inicio,
+        finMin: fin,
+        almuerzo: almuerzo,
+        almuerzoInicioMin: almInicio,
+        almuerzoFinMin: almFin,
+      );
 
   bool get turnoValido => inicio < fin;
   bool get almuerzoValido => !almuerzo || (almInicio < almFin && almInicio >= inicio && almFin <= fin);
   int get neto => (fin - inicio) - (almuerzo ? (almFin - almInicio) : 0);
 
-  /// La sesión (inicio/fin en minutos) queda fuera del turno o cruza el almuerzo.
   bool choca(int desde, int hasta) =>
       desde < inicio || hasta > fin || (almuerzo && desde < almFin && hasta > almInicio);
 }
 
 class _ConfigurarJornadaScreenState extends State<ConfigurarJornadaScreen> with ProtegeCambios {
-  /// Horas de cada día de la semana (el día que se mira y "aplicar L–V" no cuentan como cambios).
   @override
-  String get firmaFormulario =>
-      [for (final e in _ediciones) '${e.inicio}-${e.fin}-${e.almuerzo}-${e.almInicio}-${e.almFin}'].join('|');
+  String get firmaFormulario => [for (final e in _ediciones) e.firma].join('|');
 
-  static const _fotografo = 'Laura Méndez';
-  /// Hasta cuántas semanas hacia adelante se puede programar.
+  final Fotografo? _fotografoApi = fotografoJornada;
+
+  String get _fotografo => _fotografoApi?.nombre ?? 'Laura Méndez';
+
   static const _semanasAdelante = 8;
 
-  /// Semanas desde la actual (0 = esta semana).
   int _semanaOffset = 0;
+
+  bool _guardando = false;
 
   DateTime get _lunes =>
       DateTime(Reloj.hoy.year, Reloj.hoy.month, Reloj.hoy.day - (Reloj.hoy.weekday - 1) + 7 * _semanaOffset);
-  late List<Jornada> _semana = semanaLaura(_lunes);
+  late List<Jornada> _semana = semanaDe(_fotografoApi, _lunes);
   late List<_Edicion> _ediciones = [for (final j in _semana) _Edicion.desde(j)];
 
-  /// Cambia a la semana [paso] semanas antes o después y carga su jornada (lo no guardado se descarta).
+  void _recargarSemana() {
+    _semana = semanaDe(_fotografoApi, _lunes);
+    _ediciones = [for (final j in _semana) _Edicion.desde(j)];
+  }
+
   void _cambiarSemana(int paso) {
     setState(() {
       _semanaOffset += paso;
-      _semana = semanaLaura(_lunes);
-      _ediciones = [for (final j in _semana) _Edicion.desde(j)];
+      _recargarSemana();
       _dia = _semanaOffset == 0 ? Reloj.hoy.weekday - 1 : 0;
     });
-    // La semana recién cargada es el nuevo punto de partida: salir sin tocarla no pregunta.
+    reiniciarFirma();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarDeApi();
+  }
+
+  Future<void> _cargarDeApi() async {
+    final f = _fotografoApi;
+    if (f == null || horariosCargados(f)) return;
+    try {
+      await cargarHorarios(f);
+    } on ApiException catch (e) {
+      if (mounted) showHexToast(context, e.message);
+      return;
+    }
+    if (!mounted) return;
+    setState(_recargarSemana);
     reiniciarFirma();
   }
   int _dia = Reloj.hoy.weekday - 1;
@@ -85,7 +120,6 @@ class _ConfigurarJornadaScreenState extends State<ConfigurarJornadaScreen> with 
   _Edicion get _e => _ediciones[_dia];
   String get _nombre => nombreDia(_semana[_dia].fecha);
 
-  /// Jornada que regirá [dia] al guardar (con "aplicar L–V", la del día editado).
   _Edicion _vigente(int dia) => _aplicarTodos && _dia < 5 && dia < 5 ? _e : _ediciones[dia];
 
   String get _estadoAgenda {
@@ -123,23 +157,43 @@ class _ConfigurarJornadaScreenState extends State<ConfigurarJornadaScreen> with 
     );
   }
 
-  void _guardar() {
-    if (_aplicarTodos && _dia < 5) {
+  Future<void> _guardar() async {
+    final aplicaLaV = _aplicarTodos && _dia < 5;
+    if (aplicaLaV) {
       for (var i = 0; i < 5; i++) {
         if (i != _dia) _ediciones[i] = _Edicion.copia(_e);
       }
     }
-    showHexToast(context, 'Jornada ${_aplicarTodos ? 'lunes a viernes' : _nombre.toLowerCase()} guardada');
+    final f = _fotografoApi;
+    if (f != null) {
+      final dias = {
+        _dia,
+        if (aplicaLaV) ...[0, 1, 2, 3, 4],
+        for (var i = 0; i < 7; i++)
+          if (_ediciones[i].firma != _Edicion.desde(_semana[i]).firma) i,
+      };
+      setState(() => _guardando = true);
+      try {
+        await guardarJornadas(f, {for (final i in dias) _semana[i].fecha.weekday: _ediciones[i].jornada(_semana[i].fecha)});
+      } on ApiException catch (e) {
+        if (!mounted) return;
+        setState(() => _guardando = false);
+        showHexToast(context, e.message);
+        return;
+      }
+      if (!mounted) return;
+    }
+    showHexToast(context, 'Jornada ${aplicaLaV ? 'lunes a viernes' : _nombre.toLowerCase()} guardada');
     salirSinPreguntar();
   }
 
   @override
   Widget build(BuildContext context) {
     final e = _e;
-    final valido = e.turnoValido && e.almuerzoValido;
+    final valido = e.turnoValido && e.almuerzoValido && !_guardando;
     final horas = (e.fin - e.inicio) / 60;
     final total = (e.fin - e.inicio).clamp(1, 24 * 60);
-    final fotografo = fotografoPorNombre(_fotografo);
+    final fotografo = _fotografoApi ?? fotografoPorNombre(_fotografo);
 
     return protegerSalida(HeaderScaffold(
       header: HexHeader(title: 'Jornada Laboral', cerrar: true),
@@ -149,7 +203,10 @@ class _ConfigurarJornadaScreenState extends State<ConfigurarJornadaScreen> with 
         FichaJornadaCard(
           nombre: _fotografo,
           foto: fotografo?.foto ?? 'foto_sara_mendez.jpg',
-          detalle: 'Fotógrafa Principal • ID #HL-084',
+          fotografo: _fotografoApi,
+          detalle: _fotografoApi != null
+              ? '${_fotografoApi.especialidad} • ID #${_fotografoApi.id}'
+              : 'Fotógrafa Principal • ID #HL-084',
           dia: _nombre.toUpperCase(),
         ),
         const SizedBox(height: 24),
@@ -220,7 +277,7 @@ class _ConfigurarJornadaScreenState extends State<ConfigurarJornadaScreen> with 
         ),
         const SizedBox(height: 32),
         HexButton(
-          label: 'Guardar Jornada Laboral',
+          label: _guardando ? 'Guardando…' : 'Guardar Jornada Laboral',
           radius: 2,
           height: 58,
           shadow: AppShadows.medium,

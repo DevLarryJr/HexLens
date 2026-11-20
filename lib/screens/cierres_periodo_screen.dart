@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../api/api.dart';
 import '../core/reloj.dart';
 import '../data/mock_cierres.dart';
 import '../models/cierre.dart';
+import '../services/local/sesion_actual.dart';
+import '../services/remote/api_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/formato.dart';
 import '../widgets/cierres/cierre_cards.dart';
@@ -12,13 +13,11 @@ import '../widgets/hex_widgets.dart';
 
 export '../widgets/cierres/cierre_cards.dart' show FinanceTag;
 
-/// Figma: "HexLens - Cierres de Periodo" (19:4586)
 class CierresPeriodoScreen extends StatefulWidget {
   const CierresPeriodoScreen({super.key, this.onNuevoCierre, this.onVerDetalle});
 
   final VoidCallback? onNuevoCierre;
 
-  /// Abre la liquidación del cierre tocado.
   final ValueChanged<Cierre>? onVerDetalle;
 
   @override
@@ -31,10 +30,8 @@ class _CierresPeriodoScreenState extends State<CierresPeriodoScreen> with Redibu
 
   int _filtro = 0;
 
-  /// Consultando la API al abrir.
   bool _cargando = false;
 
-  /// Error al consultar la API; null si no hubo.
   String? _error;
 
   @override
@@ -44,21 +41,20 @@ class _CierresPeriodoScreenState extends State<CierresPeriodoScreen> with Redibu
   }
 
   Future<void> _recargar() async {
-    if (!Api.conectada) return;
+    if (!SesionActual.conectada) return;
     setState(() {
       _cargando = true;
       _error = null;
     });
     try {
       await sincronizarCierres();
-    } on ApiError catch (e) {
-      _error = e.mensaje;
+    } on ApiException catch (e) {
+      _error = e.message;
     } finally {
       if (mounted) setState(() => _cargando = false);
     }
   }
 
-  /// Meses que tienen cierres, del más reciente al más antiguo (primer día de cada mes).
   static List<DateTime> get _meses =>
       {for (final c in cierres) DateTime(c.inicio.year, c.inicio.month)}.toList()..sort((a, b) => b.compareTo(a));
 

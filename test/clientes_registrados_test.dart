@@ -4,7 +4,6 @@ import 'package:proyecto_movil/data/mock_clientes.dart';
 import 'package:proyecto_movil/models/cliente.dart';
 import 'package:proyecto_movil/utils/formateadores.dart';
 
-/// Lo que queda en el campo al escribir [texto] con [formato].
 String escribir(TextInputFormatter formato, String texto) =>
     formato.formatEditUpdate(TextEditingValue.empty, TextEditingValue(text: texto)).text;
 
@@ -32,9 +31,8 @@ void main() {
     );
     expect(nuevo.documento, 'C.C. 1.098.765.432');
     expect(nuevo.telefono, '+57 300 123 4567');
-    await Future<void>.delayed(Duration.zero); // deja terminar el guardado
+    await Future<void>.delayed(Duration.zero);
 
-    // "Reabrir": se vacía el directorio en memoria y se vuelve a cargar desde el celular.
     clientes.clear();
     await cargarClientesRegistrados();
     expect(clientes.length, antes + 1);

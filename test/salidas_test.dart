@@ -7,8 +7,6 @@ import 'package:proyecto_movil/screens/nueva_reserva_confirmacion_screen.dart';
 import 'package:proyecto_movil/screens/nueva_reserva_servicio_screen.dart';
 import 'package:proyecto_movil/theme/app_theme.dart';
 
-/// Una sola salida por pantalla: formularios con ✕ que protege lo escrito, y la nueva reserva con
-/// ✕ (salir de todo) separada de "Volver" (paso anterior).
 void main() {
   setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
 
@@ -16,7 +14,6 @@ void main() {
     t.view.physicalSize = const Size(1600, 8000);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
-    // La fuente de pruebas (Ahem) es más ancha que Noto Sans; este test solo mira lógica.
     await t.pumpWidget(MaterialApp(
       theme: buildAppTheme(),
       builder: (context, child) => MediaQuery(
@@ -27,7 +24,6 @@ void main() {
     ));
   }
 
-  /// Pantalla de arranque con un botón que abre [pantalla] encima (así hay a dónde volver).
   Future<void> abrirEncima(WidgetTester t, Widget pantalla) async {
     await montar(
       t,

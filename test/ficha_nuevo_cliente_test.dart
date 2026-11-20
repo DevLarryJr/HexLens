@@ -11,7 +11,6 @@ void main() {
     t.view.physicalSize = const Size(1600, 6000);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
-    // La fuente de pruebas (Ahem) es más ancha que Noto Sans; este test solo mira lógica.
     await t.pumpWidget(MaterialApp(
       theme: buildAppTheme(),
       builder: (context, child) => MediaQuery(
@@ -32,7 +31,7 @@ void main() {
 
     await t.tap(find.text('Confirmar Registro'));
     await t.pump();
-    expect(find.text('Ya existe un cliente con ese documento (Valentina Ruiz)'), findsNWidgets(2)); // campo + toast
+    expect(find.text('Ya existe un cliente con ese documento (Valentina Ruiz)'), findsNWidgets(2));
   });
 
   testWidgets('Ficha: la fecha de nacimiento queda en formato dd/mm/aaaa', (t) async {

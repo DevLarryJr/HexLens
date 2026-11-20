@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 
-import '../api/api.dart';
 import '../core/reloj.dart';
 import '../data/mock_especialidades.dart';
 import '../data/mock_fotografos.dart';
 import '../data/mock_servicios.dart';
+import '../services/remote/api_service.dart';
 import '../theme/app_theme.dart';
+import '../utils/formato.dart';
 import '../widgets/hex_form.dart';
 import '../widgets/hex_widgets.dart';
 import '../widgets/staff/registro_profesional_widgets.dart';
-import '../utils/formato.dart';
 
-/// Figma: "HexLens - Registrar Nuevo Profesional" (41:1969)
 class RegistrarProfesionalScreen extends StatefulWidget {
   const RegistrarProfesionalScreen({super.key});
 
@@ -28,22 +27,16 @@ class _RegistrarProfesionalScreenState extends State<RegistrarProfesionalScreen>
   final _nombres = TextEditingController();
   final _apellidos = TextEditingController();
 
-  /// Obligatoria en la API; null hasta que se elija.
   DateTime? _nacimiento;
   double _comision = 30;
   String _especialidad = _especialidades.firstOrNull ?? '';
 
-  /// 0 Activo, 1 En licencia, 2 Inactivo. La API solo guarda activo (sí/no): licencia e inactivo = no activo.
   int _estado = 0;
 
-  /// Enviando a la API.
   bool _guardando = false;
 
-  /// Especialidades activas del estudio.
-  /// Nombres de las especialidades (de la API si hay sesión).
   static List<String> get _especialidades => [for (final e in especialidades) e.nombre];
 
-  /// Servicio base de la especialidad: el primero del catálogo (Retratos → Retrato profesional).
   int get _precioBase =>
       (serviciosCatalogo.where((s) => s.categoria == _especialidad).firstOrNull ?? servicioEjemplo).precio;
 
@@ -90,8 +83,8 @@ class _RegistrarProfesionalScreenState extends State<RegistrarProfesionalScreen>
       if (!mounted) return;
       showHexToast(context, '${nuevo.nombre} registrado con comisión del ${nuevo.comisionPct}%');
       salirSinPreguntar();
-    } on ApiError catch (e) {
-      if (mounted) showHexToast(context, e.mensaje);
+    } on ApiException catch (e) {
+      if (mounted) showHexToast(context, e.message);
     } finally {
       if (mounted) setState(() => _guardando = false);
     }

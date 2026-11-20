@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../api/api.dart';
 import '../data/mock_especialidades.dart';
 import '../models/especialidad.dart';
+import '../services/remote/api_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/formato.dart';
 import '../widgets/especialidades/nueva_especialidad_widgets.dart';
 import '../widgets/hex_form.dart';
 import '../widgets/hex_widgets.dart';
 
-/// Figma: "HexLens - Nueva Especialidad (Modal)" (41:2172).
-/// Devuelve el nombre de la especialidad creada (o null si se cancela).
 Future<String?> showNuevaEspecialidadSheet(BuildContext context) =>
     mostrarHoja<String>(context, const _NuevaEspecialidadSheet());
 
@@ -24,7 +22,6 @@ class _NuevaEspecialidadSheet extends StatefulWidget {
 class _NuevaEspecialidadSheetState extends State<_NuevaEspecialidadSheet> {
   final _nombre = TextEditingController();
 
-  /// Enviando la especialidad a la API.
   bool _guardando = false;
 
   @override
@@ -33,20 +30,18 @@ class _NuevaEspecialidadSheetState extends State<_NuevaEspecialidadSheet> {
     super.dispose();
   }
 
-  /// Especialidad con el mismo nombre, sin distinguir mayúsculas ni tildes.
   Especialidad? get _existente {
     final nombre = sinTildes(_nombre.text.trim());
     return especialidades.where((e) => sinTildes(e.nombre) == nombre).firstOrNull;
   }
 
-  /// Crea la especialidad (en la API si hay sesión) y cierra devolviendo su nombre.
   Future<void> _guardar() async {
     setState(() => _guardando = true);
     try {
       final nueva = await crearEspecialidad(_nombre.text);
       if (mounted) Navigator.of(context).pop(nueva.nombre);
-    } on ApiError catch (e) {
-      if (mounted) showHexToast(context, e.mensaje);
+    } on ApiException catch (e) {
+      if (mounted) showHexToast(context, e.message);
     } finally {
       if (mounted) setState(() => _guardando = false);
     }

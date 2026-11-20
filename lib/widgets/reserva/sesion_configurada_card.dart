@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Resumen "SESIÓN CONFIGURADA" del paso de fecha: fecha y hora elegidas,
-/// tarifa final y botones para seguir o volver.
 class SesionConfiguradaCard extends StatelessWidget {
   const SesionConfiguradaCard({
     super.key,
@@ -14,10 +12,8 @@ class SesionConfiguradaCard extends StatelessWidget {
     this.onContinuar,
   });
 
-  /// Ej.: "Jueves, 15 Oct • 11:00 AM".
   final String fecha;
 
-  /// Ej.: "$120.000 COP".
   final String tarifa;
   final VoidCallback onBack;
   final VoidCallback? onContinuar;

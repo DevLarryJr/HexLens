@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Pie fijo del paso 2 de la reserva: resumen (precio • duración y asignación)
-/// sobre fondo desenfocado, y botones Volver / Continuar.
 class ResumenFooter extends StatelessWidget {
   const ResumenFooter({
     super.key,
@@ -15,11 +13,9 @@ class ResumenFooter extends StatelessWidget {
     this.onContinuar,
   });
 
-  /// Precio ya formateado, sin "COP".
   final String precio;
   final String duracion;
 
-  /// Ej.: "Fotógrafa disponible" o "Auto-asignación".
   final String asignacion;
   final VoidCallback onBack;
   final VoidCallback? onContinuar;
@@ -41,8 +37,6 @@ class ResumenFooter extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Flexible + scaleDown: con precios de 6 cifras y 120+ min el
-                // resumen no cabe junto a la asignación y se reduce un poco.
                 Flexible(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

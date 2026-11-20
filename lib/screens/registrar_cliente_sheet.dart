@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../api/api.dart';
 import '../core/reloj.dart';
 import '../data/mock_clientes.dart';
 import '../models/cliente.dart';
+import '../services/remote/api_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/formateadores.dart';
 import '../utils/formato.dart';
@@ -11,8 +11,6 @@ import '../widgets/clientes/registro_cliente_widgets.dart';
 import '../widgets/hex_form.dart';
 import '../widgets/hex_widgets.dart';
 
-/// Figma: "HexLens - Registrar Nuevo Cliente (Modal)" (41:1471).
-/// Hoja modal inferior para alta rápida de un cliente. Devuelve el cliente creado, o null si se descarta.
 Future<Cliente?> showRegistrarClienteSheet(BuildContext context) =>
     mostrarHoja<Cliente>(context, const _RegistrarClienteSheet(), oscuro: true);
 
@@ -41,7 +39,6 @@ class _RegistrarClienteSheetState extends State<_RegistrarClienteSheet> {
 
   Cliente? get _duplicado => clientePorDocumento(_doc.text);
 
-  /// El correo es opcional, pero si se escribe debe tener @ y dominio.
   bool get _emailInvalido {
     final email = _email.text.trim();
     return email.isNotEmpty && !esCorreo(email);
@@ -58,7 +55,6 @@ class _RegistrarClienteSheetState extends State<_RegistrarClienteSheet> {
     if (d != null && mounted) setState(() => _nacimiento.text = fechaNumerica(d));
   }
 
-  /// Enviando el cliente a la API.
   bool _guardando = false;
 
   Future<void> _guardar() async {
@@ -74,11 +70,10 @@ class _RegistrarClienteSheetState extends State<_RegistrarClienteSheet> {
         nacimiento: fechaDesdeNumerica(_nacimiento.text),
       );
       if (!mounted) return;
-      // El toast se muestra en el ScaffoldMessenger raíz, así que sigue visible al cerrar la hoja.
       showHexToast(context, 'Cliente ${cliente.nombre} registrado');
       Navigator.of(context).pop(cliente);
-    } on ApiError catch (e) {
-      if (mounted) showHexToast(context, e.mensaje);
+    } on ApiException catch (e) {
+      if (mounted) showHexToast(context, e.message);
     } finally {
       if (mounted) setState(() => _guardando = false);
     }

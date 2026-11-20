@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Acceso a un módulo de gestión (Especialidades, Servicios, Fotógrafos…).
 class ModuloLink extends StatelessWidget {
   const ModuloLink({
     super.key,
@@ -15,7 +14,6 @@ class ModuloLink extends StatelessWidget {
     this.onTap,
   });
 
-  /// Ruta dentro de `assets/icons/`.
   final String icon;
   final double iconWidth;
   final double iconHeight;
@@ -64,11 +62,9 @@ class ModuloLink extends StatelessWidget {
   }
 }
 
-/// Estado del equipo de captura del estudio.
 class HardwareStatusCard extends StatelessWidget {
   const HardwareStatusCard({super.key, required this.titulo, required this.detalle});
 
-  /// Ej.: "Estudio A — SONY α7 IV".
   final String titulo;
   final String detalle;
 

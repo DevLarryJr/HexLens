@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Encabezado de "Reagendar Sesión" y bloque no modificable con el titular y
-/// el servicio de la orden original.
 class ContextoBloqueado extends StatelessWidget {
   const ContextoBloqueado({
     super.key,
@@ -19,7 +17,6 @@ class ContextoBloqueado extends StatelessWidget {
     required this.cabina,
   });
 
-  /// Código de auditoría (el salto de línea viene del diseño).
   final String auditoria;
   final String orden;
   final String cliente;
@@ -27,7 +24,6 @@ class ContextoBloqueado extends StatelessWidget {
   final String telefono;
   final String servicio;
 
-  /// Precio ya formateado, con moneda.
   final String precio;
   final String duracion;
   final String cabina;
@@ -157,7 +153,6 @@ class ContextoBloqueado extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 2),
-                    // Wrap: con locaciones largas ("Ciclorama Blanco") la cabina baja de línea en vez de desbordar.
                     Wrap(
                       spacing: 8,
                       runSpacing: 2,

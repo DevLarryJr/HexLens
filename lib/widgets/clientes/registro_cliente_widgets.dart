@@ -4,8 +4,6 @@ import '../../theme/app_theme.dart';
 import '../hex_form.dart';
 import '../hex_widgets.dart';
 
-/// Etiqueta "HEX-MOD // CRM • BBDD", título y descripción de la hoja. Sin botón cerrar: la hoja se cierra
-/// con "Descartar" o deslizándola hacia abajo.
 class RegistroClienteCabecera extends StatelessWidget {
   const RegistroClienteCabecera({super.key});
 
@@ -53,7 +51,6 @@ class RegistroClienteCabecera extends StatelessWidget {
   }
 }
 
-/// Aviso breve de Habeas Data de la hoja.
 class HabeasDataBreve extends StatelessWidget {
   const HabeasDataBreve({super.key});
 

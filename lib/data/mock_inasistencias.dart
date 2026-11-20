@@ -1,8 +1,6 @@
 import '../core/reloj.dart';
 import '../models/inasistencia.dart';
 
-/// Inasistencias registradas del staff, ancladas a hoy: una capacitación en dos semanas, una cita médica
-/// hace 11 días y una licencia que cubre todo el mes en curso.
 final inasistencias = [
   Inasistencia(
     id: 'INA-031',
@@ -39,6 +37,5 @@ final inasistencias = [
   ),
 ];
 
-/// Quita las inasistencias de [fotografo] que cubren [dia] (vuelve a trabajar ese día).
 void liberarAusencias(String fotografo, DateTime dia) =>
     inasistencias.removeWhere((i) => i.fotografo == fotografo && i.cubre(dia));

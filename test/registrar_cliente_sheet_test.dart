@@ -22,7 +22,6 @@ void main() {
     t.view.physicalSize = const Size(1600, 6000);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
-    // La fuente de pruebas (Ahem) es más ancha que Noto Sans; este test solo mira lógica.
     await t.pumpWidget(MaterialApp(
       theme: buildAppTheme(),
       builder: (context, child) => MediaQuery(
@@ -61,7 +60,6 @@ void main() {
     await t.pumpAndSettle();
     expect(find.text('Cliente Valentina Rojas Restrepo registrado'), findsOneWidget);
 
-    // Queda guardado en el directorio, como cliente nuevo y con los datos normalizados.
     final nuevo = clientePorDocumento('1018490231')!;
     expect(nuevo.nombre, 'Valentina Rojas Restrepo');
     expect(nuevo.documento, 'C.C. 1.018.490.231');

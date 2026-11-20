@@ -1112,3 +1112,51 @@ Respaldo previo (sin git): `C:\Users\SENA\respaldos_proyectoMovil\2026-11-03_ant
   `jornada/close.svg`, `condiciones/close.svg`, `confirm/agenda.svg`, `confirm/edit.svg`, `confirmar/close.svg`,
   `reg_cliente/close.svg`, `recuperacion/volver.svg`.
 - Tests: `test/salidas_test.dart` (+7). 118 en total.
+
+## Capa de API con la estructura del profesor (09/11/2026)
+
+Pedido del usuario: conectar la API "a la misma manera que hace el profe" (ejemplo: `smartbook_app-cecar`).
+Se reemplazó `lib/api/` por la estructura del ejemplo:
+
+- `config/app_config.dart`: `AppConfig.apiBaseUrl` = `https://api.ehily.cecar.cloud/api` (`--dart-define=API_BASE_URL`).
+- `services/remote/api_service.dart`: `ApiService`, `ApiResponse<T>`, `ApiException`, `SessionException`… copiado del
+  profesor, con ajustes: mensajes en español, `success: false` de Ehily = error, `parser` en `get`,
+  `ApiService.clientePorDefecto` (MockClient en pruebas) y `respuesta.verificar()`.
+- `services/remote/api_json.dart`: lectura de `{ success, code, message, data }` y campos PascalCase/camelCase.
+- Un servicio por recurso (token de `SecureStorageService` en cada método, `Authorization: Bearer`):
+  `LoginService`, `ClienteService`, `EspecialidadService`, `ServicioService`, `ProfesionalService`,
+  `ReservaService`, `ComisionService`.
+- `models/<recurso>/*_request.dart` con `toJson()`; `models/login/login_response.dart` lee el rol del JWT.
+- `services/local/`: `SecureStorageService` (token, nueva dependencia `flutter_secure_storage`),
+  `UsuarioPreferencesService` (usuario, rol, empresa) y `SesionActual` (sesión en memoria; 401 la cierra).
+- `data/mock_*.dart` y pantallas usan los servicios; los errores son `ApiException` (`e.message`).
+- Pruebas: `iniciarSesion()` en `api_falsa.dart`; `FlutterSecureStorage.setMockInitialValues` en la config. 118 tests OK.
+
+## Servicios, modelos y persistencia como `sitramix_app` (18/11/2026)
+
+Pedido del usuario: dejar la capa de servicios, los modelos y la persistencia parecidos a los del compañero
+(`keine-byte/sitramix_app`). Reemplaza lo descrito en la sección anterior; el respaldo de antes del cambio quedó
+fuera del proyecto.
+
+- `config/api_paths.dart`: `ApiPaths`, todas las rutas de la API en un solo lugar.
+- `services/remote/api_service.dart`: `get/post/put/delete` devuelven el JSON (`Future<dynamic>`) y **lanzan**
+  `ApiException` si la respuesta es un error (ya no hay `ApiResponse<T>` ni `.verificar()`). Se conservan los
+  mensajes en español, `success: false` = error, `onUnauthorized` (401 cierra la sesión), `clientePorDefecto`
+  para pruebas, y se agregan los errores de validación `errors` de ASP.NET. `SessionException` ahora es una
+  `ApiException`. Se quitó `postMultipart` (no se usaba).
+- `services/remote/authenticated_api.dart`: clase base `AuthenticatedApi` (`api` + `token` → `authHeaders`) y
+  `parseJsonList` / `parseJsonObject` / `objetoDeRespuesta`. Reemplaza a `api_json.dart` y al bloque
+  "leer token / SessionException" que se repetía en cada método.
+- Un `XxxApi extends AuthenticatedApi` por recurso, con métodos `listar / consultar / crear / actualizar / eliminar`:
+  `ClientesApi`, `EspecialidadesApi`, `ServiciosApi`, `ProfesionalesApi`, `ReservasApi`, `HorariosLaboralesApi`,
+  `ComisionesApi` (archivos `*_api.dart`). `LoginService` se mantiene.
+- Modelos con su propio `fromJson` (antes eran funciones `xxxDesdeApi` en los servicios): `Cliente`, `Especialidad`,
+  `Servicio`, `Fotografo`, `Sesion`, `Cierre`, `SesionLiquidada`; `HorarioLaboral.tryFromJson` (puede ser null).
+  `Cliente.toJson/fromJson` del almacenamiento local pasaron a `toLocalJson/fromLocalJson`.
+  Utilidades de lectura en `models/common/json_utils.dart` (`campo`, `primerCampo`, `parseApiInt`, `parseApiText`…).
+- Persistencia: `SessionStorage` + `SecureStorageService` guardan la sesión completa (`saveSesion/readSesion`,
+  ignora la vencida); `LoginResponse` tiene `encode/tryDecode/tieneAcceso`. `main()` llama a
+  `SesionActual.restaurar()` y, si hay sesión, tras el splash carga los datos y entra a su inicio sin login.
+  El switch "Recordar sesión" del login ahora decide si se guarda.
+- `data/sincronizacion.dart`: `sincronizarTodo()`, la carga inicial que comparten el login y el arranque.
+- Tests: `test/persistencia_sesion_test.dart` (+8). 132 en total.

@@ -10,13 +10,9 @@ import '../widgets/hex_form.dart';
 import '../widgets/hex_widgets.dart';
 import '../widgets/sheets/confirmacion_sheet_frame.dart';
 
-/// Figma: "HexLens - Confirmar Cancelación (Modal)" (41:2414).
-/// Devuelve el motivo elegido si se cancela la cita, o null si se cierra.
-/// Por defecto muestra la sesión en gestión ([sesionEnGestion]).
 Future<String?> showCancelarCitaSheet(BuildContext context, {Sesion? sesion}) =>
     mostrarHoja<String>(context, _ConfirmarCancelacion(sesion: sesion ?? sesionEnGestion));
 
-/// Variante que solo indica si se canceló (true) o no.
 Future<bool?> showConfirmarCancelacionSheet(BuildContext context, {Sesion? sesion}) async =>
     await showCancelarCitaSheet(context, sesion: sesion) != null;
 
@@ -108,7 +104,6 @@ class _ConfirmarCancelacionState extends State<_ConfirmarCancelacion> {
   }
 }
 
-/// Datos de la cita que se va a cancelar.
 class _ResumenCita extends StatelessWidget {
   const _ResumenCita({
     required this.codigo,

@@ -9,7 +9,6 @@ import '../widgets/hex_form.dart';
 import '../widgets/hex_widgets.dart';
 import '../widgets/staff/registro_inasistencia_widgets.dart';
 
-/// Figma: "HexLens - Registrar Nueva Inasistencia" (41:608)
 class RegistrarInasistenciaScreen extends StatefulWidget {
   const RegistrarInasistenciaScreen({super.key});
 
@@ -24,7 +23,6 @@ class _RegistrarInasistenciaScreenState extends State<RegistrarInasistenciaScree
   int _modalidad = 1;
   bool _jornadaCompleta = true;
   String _motivo = 'Capacitación institucional';
-  /// Por defecto, una ausencia de dos días dentro de dos semanas.
   DateTime _inicio = Reloj.dia(13);
   DateTime _fin = Reloj.dia(14);
   final _obs = TextEditingController(
@@ -41,7 +39,6 @@ class _RegistrarInasistenciaScreenState extends State<RegistrarInasistenciaScree
 
   DateTime get _hasta => _modalidad == 0 ? _inicio : _fin;
 
-  /// "28-29 Oct 2026", "28 Oct 2026" o "30 Oct - 02 Nov 2026".
   String get _rango {
     String d(DateTime x) => dosCifras(x.day);
     if (mismoDia(_inicio, _hasta)) return fechaCorta(_inicio);
@@ -51,7 +48,6 @@ class _RegistrarInasistenciaScreenState extends State<RegistrarInasistenciaScree
     return '${d(_inicio)} ${mesCorto(_inicio)} - ${fechaCorta(_hasta)}';
   }
 
-  /// Reservas programadas del fotógrafo dentro de la ausencia.
   int get _citas => sesionesAgenda
       .where((s) =>
           s.fotografo == _fotografo &&

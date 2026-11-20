@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Botón flotante rojo "+ Nueva reserva".
 class NuevaReservaFab extends StatelessWidget {
   const NuevaReservaFab({super.key, this.onTap});
 

@@ -14,7 +14,6 @@ import '../widgets/calendario_mensual.dart';
 import '../widgets/hex_chips.dart';
 import '../widgets/hex_widgets.dart';
 
-/// Figma: "HexLens - Agenda Operativa" (19:349)
 class AgendaScreen extends StatefulWidget {
   const AgendaScreen({
     super.key,
@@ -25,14 +24,12 @@ class AgendaScreen extends StatefulWidget {
 
   final Widget? bottomBar;
   final VoidCallback onNuevaReserva;
-  /// Abre el detalle de la sesión tocada.
   final ValueChanged<Sesion> onAbrirSesion;
 
   @override
   State<AgendaScreen> createState() => _AgendaScreenState();
 }
 
-/// Vistas de la agenda, en el orden de las pestañas.
 enum _Vista { semanas, dia, mensual }
 
 class _AgendaScreenState extends State<AgendaScreen> with RedibujarAlCambiar {
@@ -41,13 +38,10 @@ class _AgendaScreenState extends State<AgendaScreen> with RedibujarAlCambiar {
 
   _Vista _vista = _Vista.dia;
 
-  /// Día elegido; la semana y el mes visibles son los de este día. Arranca en hoy.
   DateTime _fecha = Reloj.hoy;
 
-  /// 0 = Todas; 1..3 = índice en [_estados] + 1.
   int _filtroEstado = 0;
 
-  /// Índice en [staffAgenda]; null = todos los fotógrafos.
   int? _filtroStaff;
 
   static const _estados = [SesionEstado.programada, SesionEstado.realizada, SesionEstado.cancelada];
@@ -59,7 +53,6 @@ class _AgendaScreenState extends State<AgendaScreen> with RedibujarAlCambiar {
   List<Sesion> _sesionesDe(DateTime dia) =>
       sesionesAgenda.where((s) => mismoDia(s.inicio, dia)).toList()..sort((a, b) => a.inicio.compareTo(b.inicio));
 
-  /// Días del período que muestra la vista actual.
   List<DateTime> get _periodo => switch (_vista) {
         _Vista.dia => [_fecha],
         _Vista.semanas => [for (var i = 0; i < 7; i++) _sumar(_lunes, i)],
@@ -73,7 +66,6 @@ class _AgendaScreenState extends State<AgendaScreen> with RedibujarAlCambiar {
       (_filtroEstado == 0 || s.estado == _estados[_filtroEstado - 1]) &&
       (_filtroStaff == null || s.fotografo == staffAgenda[_filtroStaff!].$2);
 
-  /// Corre la fecha una semana (vistas Día y Semanas) o un mes (Mensual) hacia [paso] (−1 / +1).
   void _mover(int paso) => setState(() {
         if (_vista == _Vista.mensual) {
           final dias = DateTime(_fecha.year, _fecha.month + paso + 1, 0).day;
@@ -109,14 +101,12 @@ class _AgendaScreenState extends State<AgendaScreen> with RedibujarAlCambiar {
           }(),
       ];
 
-  /// "Miércoles, 21 de Octubre 2026", "Semana 43 · 19–25 Oct" u "Octubre 2026", según la vista.
   String get _rotulo => switch (_vista) {
         _Vista.dia => fechaLarga(_fecha),
         _Vista.semanas => 'Semana ${semanaIso(_lunes)} · ${_lunes.day}–${diaMes(_sumar(_lunes, 6))}',
         _Vista.mensual => '${nombreMes(_fecha)} ${_fecha.year}',
       };
 
-  /// Rótulo corto del cierre proyectado: "21 OCT", "19–25 OCT" u "OCTUBRE".
   String get _rotuloCierre => switch (_vista) {
         _Vista.dia => '${_fecha.day} ${mesCorto(_fecha).toUpperCase()}',
         _Vista.semanas => '${_lunes.day}–${_sumar(_lunes, 6).day} ${mesCorto(_sumar(_lunes, 6)).toUpperCase()}',
@@ -170,7 +160,6 @@ class _AgendaScreenState extends State<AgendaScreen> with RedibujarAlCambiar {
             onTitulo: _elegirFecha,
             onAnterior: () => _mover(-1),
             onSiguiente: () => _mover(1),
-            // Tocar un día abre su agenda.
             onSelect: (d) => setState(() {
               _fecha = d;
               _vista = _Vista.dia;
@@ -205,8 +194,6 @@ class _AgendaScreenState extends State<AgendaScreen> with RedibujarAlCambiar {
     );
   }
 
-  /// Sesiones del período: en la vista Día, la lista del día; en Semanas y Mensual, agrupadas por día
-  /// (solo los días con sesiones visibles).
   List<Widget> _lista(List<DateTime> periodo, List<Sesion> delPeriodo) {
     final visibles = delPeriodo.where(_pasaFiltros).toList();
     if (visibles.isEmpty) {
@@ -308,7 +295,6 @@ class _AgendaScreenState extends State<AgendaScreen> with RedibujarAlCambiar {
           items: staff,
           seleccion: _filtroStaff,
           acento: true,
-          // Tocar el fotógrafo elegido otra vez quita el filtro.
           onSelect: (i) => setState(() => _filtroStaff = _filtroStaff == i ? null : i),
         ),
       ],
@@ -316,11 +302,9 @@ class _AgendaScreenState extends State<AgendaScreen> with RedibujarAlCambiar {
   }
 }
 
-/// Aviso cuando el día o los filtros no dejan sesiones visibles.
 class _SinSesiones extends StatelessWidget {
   const _SinSesiones({required this.hayFiltros, required this.periodo});
 
-  /// El período tiene sesiones pero los filtros las ocultan.
   final bool hayFiltros;
   final _Vista periodo;
 
@@ -350,7 +334,6 @@ class _SinSesiones extends StatelessWidget {
   }
 }
 
-/// Encabezado de cada día en las vistas Semanas y Mensual; tocarlo abre ese día.
 class _EncabezadoDia extends StatelessWidget {
   const _EncabezadoDia({required this.dia, required this.sesiones, required this.hoy, required this.onTap});
 
@@ -395,7 +378,6 @@ class _EncabezadoDia extends StatelessWidget {
   }
 }
 
-/// Fila de chips de filtro precedida por su etiqueta ("Estado:", "Staff:").
 class _FiltroFila extends StatelessWidget {
   const _FiltroFila({
     required this.label,
@@ -410,7 +392,6 @@ class _FiltroFila extends StatelessWidget {
   final int? seleccion;
   final ValueChanged<int> onSelect;
 
-  /// Seleccionado en rosado (staff) en vez de negro (estado).
   final bool acento;
 
   @override

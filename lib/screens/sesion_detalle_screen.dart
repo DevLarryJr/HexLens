@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../api/api.dart';
 import '../core/reloj.dart';
 import '../data/mock_agenda.dart';
 import '../data/mock_clientes.dart';
 import '../data/mock_fotografos.dart';
 import '../data/mock_pagos.dart';
 import '../models/sesion.dart';
+import '../services/remote/api_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/formato.dart';
 import '../widgets/detalle/detalle_cards.dart';
@@ -14,13 +14,11 @@ import '../widgets/hex_form.dart';
 import '../widgets/hex_widgets.dart';
 import 'confirmaciones_sheets.dart';
 
-/// Figma: "HexLens - Detalle de Sesión y Acciones" (19:129)
 class SesionDetalleScreen extends StatelessWidget {
   const SesionDetalleScreen({super.key, this.onReagendar, this.sesion});
 
   final VoidCallback? onReagendar;
 
-  /// Sesión a mostrar. Por defecto, la sesión en gestión ([sesionEnGestion]).
   final Sesion? sesion;
 
   @override
@@ -38,7 +36,6 @@ class SesionDetalleScreen extends StatelessWidget {
       SesionEstado.programada when s.enCursoEn(ahora) => 'En curso',
       SesionEstado.programada => 'Programada',
     };
-    // La reserva se registra unos días antes de la sesión (dato de ejemplo).
     final creada = s.inicio.subtract(const Duration(days: 5));
 
     return HeaderScaffold(
@@ -134,8 +131,8 @@ class SesionDetalleScreen extends StatelessWidget {
               if (!context.mounted) return;
               showHexToast(context, 'Cita cancelada ($motivo). Horario liberado.');
               Navigator.of(context).maybePop();
-            } on ApiError catch (e) {
-              if (context.mounted) showHexToast(context, e.mensaje);
+            } on ApiException catch (e) {
+              if (context.mounted) showHexToast(context, e.message);
             }
           },
           leading: const SvgIcon('detalle/cancel.svg', width: 16.667),

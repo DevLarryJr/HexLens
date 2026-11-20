@@ -1,7 +1,9 @@
-/// `enTurno`: en una sesión ahora mismo; `fueraDeTurno`: fuera del horario laboral (noche o domingo).
+import '../utils/formato.dart';
+import 'common/json_utils.dart';
+import 'especialidad.dart';
+
 enum EstadoFotografo { enTurno, disponible, almuerzo, inactivo, fueraDeTurno }
 
-/// Fotógrafo del staff del estudio.
 class Fotografo {
   const Fotografo({
     required this.nombre,
@@ -18,33 +20,43 @@ class Fotografo {
     this.apellidos,
   });
 
-  /// Id en la API (null en los fotógrafos de ejemplo).
+  factory Fotografo.fromJson(Map<String, dynamic> json, {required NombreEspecialidad nombreEspecialidad}) {
+    final esp = especialidadDeJson(json, nombreEspecialidad);
+    final nombres = parseApiText(json, 'nombres');
+    final apellidos = parseApiText(json, 'apellidos');
+    final documento = soloDigitos(parseApiText(json, 'documento'));
+    final activo = campo(json, 'estado');
+    return Fotografo(
+      id: parseApiInt(campo(json, 'id') ?? campo(json, 'profesionalId')),
+      nombre: [nombres, apellidos].where((p) => p.isNotEmpty).join(' '),
+      nombres: nombres,
+      apellidos: apellidos,
+      documento: documento.isEmpty ? '' : 'C.C. ${milesConPunto(documento)}',
+      especialidad: esp.nombre,
+      especialidadId: esp.id,
+      comisionPct: parseApiInt(campo(json, 'porcentaje')) ?? 0,
+      estado: activo == false || activo == 0 ? EstadoFotografo.inactivo : EstadoFotografo.disponible,
+    );
+  }
+
   final int? id;
 
-  /// Nombre completo: "Laura Méndez".
   final String nombre;
 
-  /// Nombres y apellidos por separado, como los guarda la API (null en los de ejemplo).
   final String? nombres;
   final String? apellidos;
 
-  /// Cédula: "C.C. 52.890.123". Identifica al fotógrafo.
   final String documento;
 
-  /// Archivo dentro de `assets/images/`; null si no tiene foto (se muestran sus iniciales).
   final String? foto;
 
-  /// Nombre de su especialidad: Retratos, Familiar, Productos o Editorial.
   final String especialidad;
 
-  /// Id de la especialidad en la API (null en los de ejemplo).
   final int? especialidadId;
 
-  /// Calificación de 0 a 5. Nula si aún no tiene.
   final double? score;
   final int comisionPct;
 
-  /// Cámara y lente en custodia ('' si no se ha registrado).
   final String equipo;
   final EstadoFotografo estado;
 

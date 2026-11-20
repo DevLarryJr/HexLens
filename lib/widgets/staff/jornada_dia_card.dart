@@ -5,8 +5,6 @@ import '../../theme/app_theme.dart';
 import '../../utils/formato.dart';
 import '../hex_widgets.dart';
 
-/// Tarjeta de un día del horario semanal. Variantes: hoy (destacada, con las
-/// sesiones del estudio), regular, media jornada especial y día libre.
 class JornadaDiaCard extends StatelessWidget {
   const JornadaDiaCard({
     super.key,
@@ -20,10 +18,8 @@ class JornadaDiaCard extends StatelessWidget {
   final Jornada jornada;
   final bool hoy;
 
-  /// Texto de la pausa de almuerzo: "13:00 - 14:00 (60 min)".
   final String pausa;
 
-  /// Sesiones agendadas en el estudio (solo en la tarjeta de hoy).
   final int sesionesHoy;
   final VoidCallback? onEditar;
 

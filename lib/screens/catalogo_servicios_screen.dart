@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../api/api.dart';
 import '../data/mock_especialidades.dart';
 import '../data/mock_servicios.dart';
 import '../models/servicio.dart';
+import '../services/local/sesion_actual.dart';
+import '../services/remote/api_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/formato.dart';
 import '../widgets/hex_chips.dart';
@@ -13,8 +14,6 @@ import '../widgets/hex_widgets.dart';
 import '../widgets/servicios/servicio_catalogo_cards.dart';
 import 'crear_servicio_screen.dart';
 
-/// Figma: "HexLens - Catálogo de Servicios" (41:2).
-/// Con sesión en la API muestra los servicios reales (`/api/servicios`).
 class CatalogoServiciosScreen extends StatefulWidget {
   const CatalogoServiciosScreen({super.key, this.onNuevo});
 
@@ -28,13 +27,10 @@ class _CatalogoServiciosScreenState extends State<CatalogoServiciosScreen> with 
   @override
   Listenable get escuchar => Listenable.merge([revisionServicios, revisionEspecialidades]);
 
-  /// Especialidad elegida en los filtros; null = todas.
   String? _categoria;
 
-  /// Consultando la API al abrir.
   bool _cargando = false;
 
-  /// Error al consultar la API; null si no hubo.
   String? _error;
 
   @override
@@ -43,9 +39,8 @@ class _CatalogoServiciosScreenState extends State<CatalogoServiciosScreen> with 
     _recargar();
   }
 
-  /// Trae especialidades y servicios de la API (las especialidades dan el nombre de cada categoría).
   Future<void> _recargar() async {
-    if (!Api.conectada) return;
+    if (!SesionActual.conectada) return;
     setState(() {
       _cargando = true;
       _error = null;
@@ -53,8 +48,8 @@ class _CatalogoServiciosScreenState extends State<CatalogoServiciosScreen> with 
     try {
       await sincronizarEspecialidades();
       await sincronizarServicios();
-    } on ApiError catch (e) {
-      _error = e.mensaje;
+    } on ApiException catch (e) {
+      _error = e.message;
     } finally {
       if (mounted) setState(() => _cargando = false);
     }
@@ -66,7 +61,6 @@ class _CatalogoServiciosScreenState extends State<CatalogoServiciosScreen> with 
   @override
   Widget build(BuildContext context) {
     final todos = serviciosCatalogo;
-    // Categorías: las especialidades que tienen servicios, en el orden de la lista.
     final categorias = {for (final s in todos) s.categoria}.toList();
     if (_categoria != null && !categorias.contains(_categoria)) _categoria = null;
     final visibles = todos

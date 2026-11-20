@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Encabezado del paso 1: sistema, "Paso 1 de 4", título y la barra de pasos.
 class ReservaClienteIntro extends StatelessWidget {
   const ReservaClienteIntro({super.key});
 
@@ -94,7 +93,6 @@ class ReservaClienteIntro extends StatelessWidget {
   }
 }
 
-/// Tarjeta seleccionable de un cliente encontrado.
 class ClienteResultadoCard extends StatelessWidget {
   const ClienteResultadoCard({
     super.key,
@@ -114,16 +112,13 @@ class ClienteResultadoCard extends StatelessWidget {
   final String documento;
   final String telefono;
 
-  /// Contenido del avatar de 48 px (foto o ícono).
   final Widget avatar;
   final bool selected;
   final VoidCallback? onTap;
   final String? email;
 
-  /// "Recurrente (3 sesiones)". Con él, el nombre va en negrita.
   final String? recurrente;
 
-  /// Franja inferior "Último lookbook…" con su fecha.
   final String? ultimaSesion;
   final String? fechaUltima;
 
@@ -244,7 +239,6 @@ class _Radio extends StatelessWidget {
   }
 }
 
-/// "Parámetros Rápidos de Sesión" para el cliente elegido.
 class ParametrosRapidosCard extends StatelessWidget {
   const ParametrosRapidosCard({super.key, required this.cliente});
 

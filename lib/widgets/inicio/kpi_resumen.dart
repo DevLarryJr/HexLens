@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// "RESUMEN DE OPERACIÓN": sesiones del día, pendientes y realizadas.
 class KpiResumen extends StatelessWidget {
   const KpiResumen({super.key, required this.total, required this.pendientes, required this.realizadas});
 

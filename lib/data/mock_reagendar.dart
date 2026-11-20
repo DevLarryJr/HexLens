@@ -6,7 +6,6 @@ import '../utils/formato.dart';
 import 'mock_agenda.dart';
 import 'mock_inasistencias.dart';
 
-/// Operadores a los que se puede reasignar la sesión en la franja [hora].
 List<OpcionStaff> opcionesStaffReagendar(String hora) => [
       const OpcionStaff(
         nombre: 'Laura Méndez (Titular actual)',
@@ -26,20 +25,15 @@ List<OpcionStaff> opcionesStaffReagendar(String hora) => [
       ),
     ];
 
-/// Hasta cuántos meses hacia adelante se puede reagendar.
 const mesesReagendar = 6;
 
-/// Horas de inicio que ofrece el estudio para reagendar; la de las 5:00 PM es el cierre.
 const _horas = [(9, 0), (10, 0), (11, 30), (14, 15), (15, 45), (17, 0)];
 
-/// El día no admite sesiones: ya pasó, es domingo (estudio cerrado) o el fotógrafo está ausente.
 bool diaBloqueadoReagendar(DateTime dia, String fotografo) =>
     dia.isBefore(Reloj.hoy) ||
     dia.weekday == DateTime.sunday ||
     inasistencias.any((i) => i.fotografo == fotografo && i.cubre(dia));
 
-/// Franjas de [dia] para mover [sesion]: "OCUPADO" si el fotógrafo ya tiene otra sesión que se cruza,
-/// "PASADO" si la hora ya pasó (hoy) y "CIERRE" la última del día.
 List<FranjaHoraria> franjasReagendar(DateTime dia, Sesion sesion) {
   final otras = sesionesAgenda.where((s) =>
       !identical(s, sesion) && !s.cancelada && s.fotografo == sesion.fotografo && mismoDia(s.inicio, dia));

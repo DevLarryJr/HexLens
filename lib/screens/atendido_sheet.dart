@@ -11,8 +11,6 @@ import '../widgets/hex_form.dart';
 import '../widgets/hex_widgets.dart';
 import '../widgets/sheets/confirmacion_sheet_frame.dart';
 
-/// Figma: "HexLens - Confirmar Servicio Atendido (Modal)" (41:2596). Devuelve true al confirmar.
-/// Por defecto muestra la sesión en gestión ([sesionEnGestion]).
 Future<bool?> showConfirmarAtendidoSheet(BuildContext context, {Sesion? sesion}) =>
     mostrarHoja<bool>(context, _ConfirmarAtendido(sesion: sesion ?? sesionEnGestion), oscuro: true);
 
@@ -103,7 +101,6 @@ class _ConfirmarAtendidoState extends State<_ConfirmarAtendido> {
   }
 }
 
-/// Cliente, fotógrafo, servicio y facturación de la sesión en curso.
 class _ResumenAtendido extends StatelessWidget {
   const _ResumenAtendido({
     required this.codigo,

@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Encabezado "NUEVA RESERVA · Paso N de 4" con barras de progreso y la
-/// tarjeta del servicio, fotógrafo y cliente ya elegidos.
 class ReservaProgreso extends StatelessWidget {
   const ReservaProgreso({
     super.key,
@@ -14,10 +12,8 @@ class ReservaProgreso extends StatelessWidget {
     required this.cliente,
   });
 
-  /// Paso activo, 0..3.
   final int paso;
 
-  /// Ej.: "RETRATO PROFESIONAL (45M)".
   final String servicio;
   final String fotografo;
   final String cliente;
@@ -121,7 +117,6 @@ class _Paso extends StatelessWidget {
           children: [
             Padding(padding: const EdgeInsets.only(top: 2), child: SvgIcon(icono, width: 10.833)),
             const SizedBox(width: 2),
-            // Hasta 2 líneas ("Fecha y / hora"): en una sola, con 12 px, se cortaban.
             Flexible(
               child: Text(label,
                   maxLines: 2,

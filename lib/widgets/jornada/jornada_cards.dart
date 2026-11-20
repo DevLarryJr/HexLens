@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../../models/fotografo.dart';
 import '../../theme/app_theme.dart';
+import '../fotografos/foto_fotografo.dart';
 import '../hex_form.dart';
 import '../hex_widgets.dart';
 
-/// Ficha del fotógrafo cuya jornada se edita, con la etiqueta del día.
 class FichaJornadaCard extends StatelessWidget {
   const FichaJornadaCard({
     super.key,
@@ -12,17 +13,17 @@ class FichaJornadaCard extends StatelessWidget {
     required this.foto,
     required this.detalle,
     required this.dia,
+    this.fotografo,
   });
+
+  final Fotografo? fotografo;
 
   final String nombre;
 
-  /// Archivo dentro de `assets/images/`.
   final String foto;
 
-  /// "Fotógrafa Principal • ID #HL-084"
   final String detalle;
 
-  /// Nombre del día en mayúsculas: "JUEVES".
   final String dia;
 
   @override
@@ -61,7 +62,9 @@ class FichaJornadaCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: AppRadius.sm,
-                child: Image.asset('assets/images/$foto', width: 60, height: 60, fit: BoxFit.cover),
+                child: fotografo != null
+                    ? FotoFotografo(fotografo!, tamano: 60)
+                    : Image.asset('assets/images/$foto', width: 60, height: 60, fit: BoxFit.cover),
               ),
               const SizedBox(width: 20),
               Expanded(
@@ -83,7 +86,6 @@ class FichaJornadaCard extends StatelessWidget {
   }
 }
 
-/// Fila horizontal de días: el seleccionado va en negro con su nombre completo.
 class DiaProgramaSelector extends StatelessWidget {
   const DiaProgramaSelector({
     super.key,
@@ -93,10 +95,8 @@ class DiaProgramaSelector extends StatelessWidget {
     required this.onSelect,
   });
 
-  /// "Lun", "Mar"…
   final List<String> cortos;
 
-  /// "Lunes", "Martes"… (se muestra el del día seleccionado).
   final List<String> completos;
   final int seleccionado;
   final ValueChanged<int> onSelect;
@@ -143,7 +143,6 @@ class DiaProgramaSelector extends StatelessWidget {
   }
 }
 
-/// Caja de hora con selector (tap) y flechas de ±30 min.
 class HoraStepperBox extends StatelessWidget {
   const HoraStepperBox({
     super.key,
@@ -157,7 +156,6 @@ class HoraStepperBox extends StatelessWidget {
 
   final String label;
 
-  /// Texto ya formateado: "08:00 AM".
   final String hora;
   final Widget icon;
   final VoidCallback? onTap;
@@ -201,7 +199,6 @@ class HoraStepperBox extends StatelessWidget {
   }
 }
 
-/// "Rango de Turno General": horas de inicio y fin con su validación.
 class TurnoCard extends StatelessWidget {
   const TurnoCard({
     super.key,
@@ -211,12 +208,10 @@ class TurnoCard extends StatelessWidget {
     required this.cobertura,
   });
 
-  /// Cajas de hora ([HoraStepperBox]).
   final Widget inicio;
   final Widget fin;
   final bool valido;
 
-  /// "9 horas brutas"
   final String cobertura;
 
   @override
@@ -279,8 +274,6 @@ class TurnoCard extends StatelessWidget {
   }
 }
 
-/// Pausa de almuerzo: interruptor, horas, validación, barra de la jornada y
-/// disponibilidad neta.
 class AlmuerzoCard extends StatelessWidget {
   const AlmuerzoCard({
     super.key,
@@ -299,20 +292,16 @@ class AlmuerzoCard extends StatelessWidget {
   final bool activo;
   final ValueChanged<bool> onActivo;
 
-  /// Cajas de hora ([HoraStepperBox]).
   final Widget inicio;
   final Widget fin;
   final bool valido;
 
-  /// Texto de la validación correcta.
   final String okText;
 
-  /// Fracción de la jornada antes del almuerzo y fracción que ocupa (0–1).
   final double antes;
   final double duracion;
   final int duracionMin;
 
-  /// Minutos efectivos de la jornada.
   final int netoMin;
 
   @override
@@ -465,14 +454,12 @@ class _DisponibilidadNeta extends StatelessWidget {
   }
 }
 
-/// "Aplicar a lunes–viernes" con el estado de la agenda.
 class AplicarTodosCard extends StatelessWidget {
   const AplicarTodosCard({super.key, required this.aplicar, required this.onToggle, required this.estado});
 
   final bool aplicar;
   final VoidCallback onToggle;
 
-  /// "0 conflictos con …"
   final String estado;
 
   @override

@@ -4,7 +4,6 @@ import '../../theme/app_theme.dart';
 import '../hex_form.dart';
 import '../hex_widgets.dart';
 
-/// Franja "HEX-CATALOG // GESTIÓN DE TARIFAS" con la versión del formulario.
 class CatalogoFranja extends StatelessWidget {
   const CatalogoFranja({super.key});
 
@@ -27,7 +26,6 @@ class CatalogoFranja extends StatelessWidget {
   }
 }
 
-/// Reparto del precio entre el estudio y el fotógrafo.
 class RepartoTarifa extends StatelessWidget {
   const RepartoTarifa({
     super.key,
@@ -70,7 +68,6 @@ class RepartoTarifa extends StatelessWidget {
   }
 }
 
-/// Encabezado "Duración estimada" con el valor elegido ("45 MIN // STD").
 class DuracionHeader extends StatelessWidget {
   const DuracionHeader({super.key, required this.valor});
 
@@ -90,7 +87,6 @@ class DuracionHeader extends StatelessWidget {
   }
 }
 
-/// Cuatro bloques de duración (minutos + nombre).
 class DuracionSelector extends StatelessWidget {
   const DuracionSelector({super.key, required this.opciones, required this.selected, required this.onSelect});
 
@@ -142,7 +138,6 @@ class DuracionSelector extends StatelessWidget {
   }
 }
 
-/// Foto de preset con título y detalle sobre degradado.
 class PresetCard extends StatelessWidget {
   const PresetCard({super.key, required this.foto, required this.titulo, required this.detalle});
 
@@ -188,7 +183,6 @@ class PresetCard extends StatelessWidget {
   }
 }
 
-/// "FICHA TÉCNICA DE EQUIPAMIENTO": cámara, disparador y tiempo de edición.
 class FichaEquipamiento extends StatelessWidget {
   const FichaEquipamiento({super.key});
 

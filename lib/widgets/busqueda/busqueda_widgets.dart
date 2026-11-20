@@ -6,50 +6,15 @@ import '../../theme/app_theme.dart';
 import '../hex_chips.dart';
 import '../hex_widgets.dart';
 
-/// Cabecera "ESTUDIO // SYS — Búsqueda Global" con desenfoque.
 class BusquedaHeader extends StatelessWidget {
   const BusquedaHeader({super.key, this.onBack});
 
   final VoidCallback? onBack;
 
   @override
-  Widget build(BuildContext context) {
-    return BlurTopBar(
-      height: 72,
-      padding: const EdgeInsets.only(left: 8, right: 20),
-      child: Row(
-        children: [
-          IconButton(onPressed: onBack, icon: const SvgIcon('busqueda/back.svg', width: 13.3, height: 13.3)),
-          Image.asset('assets/images/logo_hexlens.png', width: 100, height: 36, fit: BoxFit.contain),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('ESTUDIO',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppText.sans(15, color: AppColors.onSurfaceVariant, letterSpacing: 1)),
-                Text('Búsqueda', overflow: TextOverflow.ellipsis, style: AppText.sans(19, weight: FontWeight.w600)),
-              ],
-            ),
-          ),
-          Container(
-            width: 32,
-            height: 24,
-            color: AppColors.surfaceHigh,
-            child: const Center(child: Dot(size: 10, color: AppColors.accent)),
-          ),
-          const SizedBox(width: 8),
-          const UserAvatar(icon: 'agenda/person.svg'),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => HexHeader(title: 'Búsqueda', onBack: onBack);
 }
 
-/// Barra inferior de la búsqueda (Sesiones, Catálogo, Equipos, Ajustes).
 class BusquedaNav extends StatelessWidget {
   const BusquedaNav({super.key, this.onTap});
 
@@ -94,7 +59,6 @@ class BusquedaNav extends StatelessWidget {
   }
 }
 
-/// Chip de tipo de resultado con su número de coincidencias.
 class BusquedaFiltroChip extends StatelessWidget {
   const BusquedaFiltroChip({super.key, required this.label, required this.count, required this.selected, this.onTap});
 
@@ -127,7 +91,6 @@ class BusquedaFiltroChip extends StatelessWidget {
   }
 }
 
-/// Franja de estado "HEX-SYS // QUERY_OK — MATCH_003".
 class QueryEstadoBar extends StatelessWidget {
   const QueryEstadoBar({super.key, required this.coincidencias});
 
@@ -155,7 +118,6 @@ class QueryEstadoBar extends StatelessWidget {
   }
 }
 
-/// Fila de resultado: ícono, título, detalle y tipo.
 class ResultadoBusquedaCard extends StatelessWidget {
   const ResultadoBusquedaCard({
     super.key,
@@ -169,7 +131,6 @@ class ResultadoBusquedaCard extends StatelessWidget {
   final String titulo;
   final String detalle;
 
-  /// "CLIENTES", "SERVICIOS"…
   final String tipo;
 
   @override
@@ -201,7 +162,6 @@ class ResultadoBusquedaCard extends StatelessWidget {
   }
 }
 
-/// Estado vacío: ilustración, explicación, sugerencia y acciones.
 class SinResultados extends StatelessWidget {
   const SinResultados({super.key, required this.consulta, this.onRestablecer, this.onRegistrar});
 
@@ -317,11 +277,9 @@ class SinResultados extends StatelessWidget {
   }
 }
 
-/// Ilustración "visor sin coincidencias": hexágono punteado, lente y trazo de error.
 class _SinResultadosPainter extends CustomPainter {
   const _SinResultadosPainter();
 
-  /// Grises propios de la ilustración.
   static const _trazo = Color(0xFFA0A0A0);
   static const _cruz = Color(0xFF888888);
 
@@ -333,7 +291,6 @@ class _SinResultadosPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
 
-    // Marcas del visor en las esquinas y bordes.
     final tp = TextPainter(textDirection: TextDirection.ltr);
     for (final o in [
       const Offset(14, 14),
@@ -352,7 +309,6 @@ class _SinResultadosPainter extends CustomPainter {
     canvas.drawLine(Offset(6, c.dy - 10), Offset(6, c.dy + 10), marca);
     canvas.drawLine(Offset(size.width - 6, c.dy - 10), Offset(size.width - 6, c.dy + 10), marca);
 
-    // Hexágono punteado.
     const r = 46.0;
     final pts = [for (var i = 0; i < 6; i++) c + Offset.fromDirection(math.pi / 6 + i * math.pi / 3, r)];
     final punteado = Paint()
@@ -367,12 +323,10 @@ class _SinResultadosPainter extends CustomPainter {
       }
     }
 
-    // Lente.
     canvas.drawCircle(c, 30, gris);
     canvas.drawCircle(c, 18, gris);
     canvas.drawCircle(c, 4, Paint()..color = _trazo);
 
-    // Trazo de error bermellón + destello.
     final rojo = Paint()
       ..color = AppColors.accent
       ..strokeWidth = 3

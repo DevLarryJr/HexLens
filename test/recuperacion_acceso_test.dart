@@ -11,7 +11,6 @@ void main() {
     t.view.physicalSize = const Size(1600, 5000);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
-    // La fuente de pruebas (Ahem) es más ancha que Noto Sans; este test solo mira lógica.
     await t.pumpWidget(MaterialApp(
       theme: buildAppTheme(),
       builder: (context, child) => MediaQuery(
@@ -46,6 +45,6 @@ void main() {
     await t.tap(find.text('7'));
     await t.pump();
     expect(conBorde(t), hasLength(1));
-    await t.pumpWidget(const SizedBox()); // detiene el temporizador
+    await t.pumpWidget(const SizedBox());
   });
 }

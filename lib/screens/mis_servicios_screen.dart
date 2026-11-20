@@ -13,7 +13,6 @@ import '../widgets/mis_servicios/servicio_staff_card.dart';
 import '../widgets/mis_servicios/staff_bottom_nav.dart';
 import '../widgets/mis_servicios/staff_resumen_cards.dart';
 
-/// Figma: "HexLens - Mis Servicios (Fotógrafo)" (19:5041). Inicio del rol Fotógrafo.
 class MisServiciosScreen extends StatefulWidget {
   const MisServiciosScreen({super.key, this.onVerFicha, this.onComisiones, this.onCuenta});
 
@@ -49,14 +48,12 @@ class _MisServiciosScreenState extends State<MisServiciosScreen> with ConBusqued
     if (i == 2) widget.onCuenta?.call();
   }
 
-  /// Primera sesión programada de hoy, por hora de inicio.
   Sesion? get _proxima {
     final hoy = programadasDeHoy(misServicios)
       ..sort((a, b) => a.inicio.compareTo(b.inicio));
     return hoy.isEmpty ? null : hoy.first;
   }
 
-  /// "Retrato Profesional" → "Retrato profesional".
   static String _oracion(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1).toLowerCase();
 
   @override
@@ -123,7 +120,7 @@ class _MisServiciosScreenState extends State<MisServiciosScreen> with ConBusqued
               ],
             ),
           ),
-          const Positioned(top: 0, left: 0, right: 0, child: BlurTopBar(child: _Marca())),
+          const Positioned(top: 0, left: 0, right: 0, child: HexHeader(section: 'Mis Servicios')),
         ],
       ),
     );
@@ -165,40 +162,6 @@ class _MisServiciosScreenState extends State<MisServiciosScreen> with ConBusqued
             style: AppText.sans(14, weight: FontWeight.w500, lineHeight: 18),
           ),
         ),
-      ],
-    );
-  }
-}
-
-/// Logo, estado ONLINE y nombre de la sección en la barra superior.
-class _Marca extends StatelessWidget {
-  const _Marca();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Image.asset('assets/images/logo_hexlens.png', width: 110, height: 36, fit: BoxFit.contain),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('HEXLENS', style: AppText.sans(16, weight: FontWeight.w600, lineHeight: 20)),
-              Row(
-                children: [
-                  const Dot(size: 6, color: AppColors.accentBright),
-                  const SizedBox(width: 4),
-                  Text('EN LÍNEA', style: AppText.sans(12, color: AppColors.accentBright, lineHeight: 16)),
-                  const SizedBox(width: 10),
-                  Text('Mis Servicios', style: AppText.sans(14, weight: FontWeight.w500, lineHeight: 16)),
-                ],
-              ),
-            ],
-          ),
-        ),
-        const UserAvatar(icon: 'agenda/person.svg'),
       ],
     );
   }

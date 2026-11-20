@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Botón negro ancho "Nueva reserva" con barra de acento. Al tocarlo muestra
-/// el aviso "Preparando formulario de reserva..." y llama a [onTap].
 class NuevaReservaBanner extends StatelessWidget {
   const NuevaReservaBanner({super.key, required this.onTap});
 

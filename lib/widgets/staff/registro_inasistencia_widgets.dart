@@ -4,7 +4,6 @@ import '../../theme/app_theme.dart';
 import '../hex_form.dart';
 import '../hex_widgets.dart';
 
-/// Ficha del fotógrafo al que se le registra la ausencia, con el operador a cambiar.
 class PersonalAsignadoCard extends StatelessWidget {
   const PersonalAsignadoCard({
     super.key,
@@ -17,16 +16,12 @@ class PersonalAsignadoCard extends StatelessWidget {
 
   final String nombre;
 
-  /// Archivo dentro de `assets/images/`.
   final String foto;
 
-  /// "STAFF-ID: 804"
   final String staffId;
 
-  /// "Especialidad: … • C.C. …"
   final String detalle;
 
-  /// Texto del selector "Cambiar operador".
   final String operador;
 
   @override
@@ -100,7 +95,6 @@ class PersonalAsignadoCard extends StatelessWidget {
   }
 }
 
-/// "Periodo de Desconexión": fechas, validación y jornada completa.
 class PeriodoDesconexionCard extends StatelessWidget {
   const PeriodoDesconexionCard({
     super.key,
@@ -116,7 +110,6 @@ class PeriodoDesconexionCard extends StatelessWidget {
 
   final int dias;
 
-  /// Fechas ya formateadas. Sin [fin], es un día específico.
   final String inicio;
   final String? fin;
   final bool valido;
@@ -209,14 +202,11 @@ class PeriodoDesconexionCard extends StatelessWidget {
   }
 }
 
-/// "Auditoría de Agenda": reservas del fotógrafo que chocan con la ausencia.
 class AuditoriaAgendaCard extends StatelessWidget {
   const AuditoriaAgendaCard({super.key, required this.rango, required this.citas, required this.fotografo});
 
-  /// "28-29 Oct 2026"
   final String rango;
 
-  /// Reservas programadas del fotógrafo dentro del rango.
   final int citas;
   final String fotografo;
 

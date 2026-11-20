@@ -14,7 +14,6 @@ void main() {
     t.view.physicalSize = const Size(1600, 8000);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
-    // La fuente de pruebas (Ahem) es más ancha que Noto Sans; este test solo mira lógica.
     await t.pumpWidget(MaterialApp(
       theme: buildAppTheme(),
       builder: (context, child) => MediaQuery(
@@ -27,7 +26,7 @@ void main() {
 
   testWidgets('Confirmación: por defecto muestra la reserva de ejemplo desde los modelos', (t) async {
     await abrir(t, const NuevaReservaConfirmacionScreen());
-    expect(find.text('\$120.000 '), findsNothing); // va en un TextSpan
+    expect(find.text('\$120.000 '), findsNothing);
     expect(find.textContaining('120.000'), findsOneWidget);
     expect(find.text('VR'), findsOneWidget);
     expect(find.text('C.C. 1.025.340.890 (Bogotá D.C.)'), findsOneWidget);
@@ -40,9 +39,9 @@ void main() {
     await abrir(
       t,
       NuevaReservaConfirmacionScreen(
-        cliente: clientes[1], // Andrés Molina
-        servicio: serviciosReserva[3], // Sesión familiar, 90 min, $220.000
-        fotografo: fotografos[1], // Mateo Ríos, 35 %
+        cliente: clientes[1],
+        servicio: serviciosReserva[3],
+        fotografo: fotografos[1],
         inicio: DateTime(2026, 10, 16, 11, 30),
         lugar: 'Set Principal',
       ),

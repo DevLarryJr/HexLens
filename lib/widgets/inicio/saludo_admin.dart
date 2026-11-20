@@ -3,14 +3,11 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../hex_widgets.dart';
 
-/// Saludo del inicio administrativo con indicador "EN VIVO" y la fecha.
 class SaludoAdmin extends StatelessWidget {
   const SaludoAdmin({super.key, required this.fecha, this.saludo = 'Hola'});
 
-  /// "Buenos días", "Buenas tardes"…
   final String saludo;
 
-  /// Ej.: "Jueves, 15 de octubre de 2026".
   final String fecha;
 
   @override

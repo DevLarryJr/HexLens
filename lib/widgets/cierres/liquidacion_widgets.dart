@@ -6,13 +6,11 @@ import '../../utils/formato.dart';
 import '../fotografos/foto_fotografo.dart';
 import '../hex_widgets.dart';
 
-/// Selector "Todos (N)" + un chip por fotógrafo con su tasa.
 class LiquidacionSelector extends StatelessWidget {
   const LiquidacionSelector({super.key, required this.liquidaciones, required this.selected, required this.onSelect});
 
   final List<Liquidacion> liquidaciones;
 
-  /// 0 = Todos; i = liquidaciones[i - 1].
   final int selected;
   final ValueChanged<int> onSelect;
 
@@ -61,7 +59,6 @@ class LiquidacionSelector extends StatelessWidget {
   }
 }
 
-/// Resumen del fotógrafo: perfil, contrato, comisión neta, base y margen del estudio.
 class LiquidacionResumenCard extends StatelessWidget {
   const LiquidacionResumenCard({super.key, required this.liquidacion});
 
@@ -200,7 +197,6 @@ class LiquidacionResumenCard extends StatelessWidget {
   }
 }
 
-/// Sesión realizada con su tarifa, la comisión del fotógrafo y la retención del estudio.
 class SesionLiquidadaCard extends StatelessWidget {
   const SesionLiquidadaCard({super.key, required this.sesion, required this.tasa});
 
@@ -284,11 +280,9 @@ class SesionLiquidadaCard extends StatelessWidget {
   }
 }
 
-/// "Σ FÓRMULA DE LIQUIDACIÓN TRANSPARENTE".
 class FormulaLiquidacion extends StatelessWidget {
   const FormulaLiquidacion({super.key, required this.porcentaje});
 
-  /// "30%" o "según cada contrato".
   final String porcentaje;
 
   @override
